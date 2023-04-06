@@ -14,8 +14,7 @@ interface Props {
 
 const Header: React.FC<Props> = ({ title, scrollToTop }) => {
     const clickCount = useRef(0);
-    const { sidebarCollapsed, setSidebarCollapsed, hasContext, setHasContext } =
-        useContext(AppStore);
+    const { sidebarCollapsed, hasContext, setData, setSidebarCollapsed } = useContext(AppStore);
 
     const onCollapse = () => setSidebarCollapsed(!sidebarCollapsed);
 
@@ -30,7 +29,7 @@ const Header: React.FC<Props> = ({ title, scrollToTop }) => {
     };
 
     const onChangeContext = () => {
-        setHasContext(!hasContext);
+        setData({ hasContext: !hasContext });
         message.success("当前会话已" + (hasContext ? "关闭" : "开启") + "上下文");
     };
 

@@ -9,6 +9,7 @@ declare global {
             SOCKS_PROXY_HOST: string;
             SOCKS_PROXY_PORT: string;
             API_REVERSE_PROXY: string;
+            LOCAL_ACCESS_TOKENS: string;
         }
     }
 }

@@ -14,7 +14,7 @@ const useTheme = () => {
             return;
         }
 
-        setType(theme);
+        setType(theme as "light" | "dark");
     }, [theme]);
 
     useEffect(() => {

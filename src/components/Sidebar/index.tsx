@@ -14,7 +14,7 @@ import classNames from "classnames";
 interface Props {}
 
 const Sidebar: React.FC<Props> = () => {
-    const { sidebarCollapsed, setSidebarCollapsed } = useContext(AppStore);
+    const { sidebarCollapsed, setData, setSidebarCollapsed } = useContext(AppStore);
     const isMobile = useIsMobile();
     const theme = useTheme();
     const router = useRouter();

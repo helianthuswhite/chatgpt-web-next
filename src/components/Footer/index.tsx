@@ -20,7 +20,7 @@ const Footer: React.FC<Props> = ({ onMessageUpdate, responding, setResponding })
     const isMobile = useIsMobile();
     const router = useRouter();
     const { chat, history, addChat, clearChat, updateHistory } = useContext(ChatStore);
-    const { hasContext, setHasContext } = useContext(AppStore);
+    const { hasContext, setData } = useContext(AppStore);
     const [value, setValue] = useState("");
     const { request } = useChatProgress(responding, setResponding);
     const uuid = +(router.query.id || 0);
@@ -78,7 +78,7 @@ const Footer: React.FC<Props> = ({ onMessageUpdate, responding, setResponding })
     };
 
     const onChangeContext = () => {
-        setHasContext(!hasContext);
+        setData({ hasContext: !hasContext });
         message.success("当前会话已" + (hasContext ? "关闭" : "开启") + "上下文");
     };
 

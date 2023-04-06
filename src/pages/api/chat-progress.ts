@@ -1,14 +1,16 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { chatReplyProcess, installChatGPT } from "@/service/chatgpt";
 import { ConversationRequest } from "@/store/Chat";
+import requestAuth from "@/utils/requestAuth";
 import { ChatMessage } from "chatgpt";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     res.setHeader("Content-type", "application/octet-stream");
-    await installChatGPT();
 
     try {
+        await requestAuth(req);
+        await installChatGPT();
         const { prompt, options = {} } = req.body as {
             prompt: string;
             options?: ConversationRequest;

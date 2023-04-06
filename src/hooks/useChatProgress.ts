@@ -1,4 +1,5 @@
 import http from "@/service/http";
+import { AppStore } from "@/store/App";
 import { ChatStore } from "@/store/Chat";
 import { useRouter } from "next/router";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
@@ -6,6 +7,7 @@ import { useContext, useEffect, useMemo, useRef, useState } from "react";
 const useChatProgress = (responding: boolean, setResponding: (e: boolean) => void) => {
     const router = useRouter();
     const { chat, updateChat } = useContext(ChatStore);
+    const { token } = useContext(AppStore);
     const controller = useRef<AbortController>();
     const uuid = +(router.query.id || 0);
     const conversationList = useMemo(() => {
@@ -38,6 +40,9 @@ const useChatProgress = (responding: boolean, setResponding: (e: boolean) => voi
                 },
                 {
                     signal,
+                    headers: {
+                        authorization: token,
+                    },
                     onDownloadProgress: (
                         progressEvent: ProgressEvent<XMLHttpRequestEventTarget>
                     ) => {

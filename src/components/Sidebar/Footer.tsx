@@ -1,16 +1,14 @@
-import { Avatar as AvatarComp, Layout, Tooltip } from "antd";
-import { useContext } from "react";
-import { UserStore } from "@/store/User";
-import useIsMobile from "@/hooks/useIsMobile";
-import { AppStore } from "@/store/App";
-import Scrollbar from "@/components/Scrollbar";
+import { Tooltip } from "antd";
 import classNames from "classnames";
-import Avatar from "@/components/Avatar";
 import { SettingOutlined } from "@ant-design/icons";
 import UserAvatar from "@/components/UserAvatar";
 import Button from "@/components/Button";
+import Setting from "@/components/Setting";
+import { useState } from "react";
 
 const Footer: React.FC = () => {
+    const [settingOpen, setSettingOpen] = useState(false);
+
     return (
         <footer
             className={classNames(
@@ -35,12 +33,12 @@ const Footer: React.FC = () => {
                     type="text"
                     shape="circle"
                     className="flex text-xl text-[#4f555e] dark:text-white justify-center"
+                    onClick={() => setSettingOpen(true)}
                 >
                     <SettingOutlined />
                 </Button>
             </Tooltip>
-
-            {/* <Setting v-if="show" v-model:visible="show" /> */}
+            <Setting open={settingOpen} onCancel={() => setSettingOpen(false)} />
         </footer>
     );
 };
