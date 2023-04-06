@@ -74,17 +74,6 @@ const useChatProgress = (responding: boolean, setResponding: (e: boolean) => voi
             }
 
             const errorMessage = error?.message ?? "好像出错误了，请稍后再试";
-            if (currentChat?.text && currentChat.text !== "") {
-                updateChat(uuid, index, {
-                    ...currentChat,
-                    text: `${currentChat.text}\n[${errorMessage}]`,
-                    error: false,
-                    loading: false,
-                });
-                onMessageUpdate?.();
-                return;
-            }
-
             updateChat(uuid, index, {
                 dateTime: new Date().toLocaleString(),
                 text: errorMessage,

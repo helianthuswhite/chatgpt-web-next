@@ -63,7 +63,8 @@ const Footer: React.FC<Props> = ({ onMessageUpdate, responding, setResponding })
         });
         onMessageUpdate();
 
-        request(conversationList.length - 1, onMessageUpdate);
+        //  if converationList is empty, update index should be 1, because there are two addChat method executes
+        request(conversationList.length ? conversationList.length - 1 : 1, onMessageUpdate);
     };
 
     const onClear = () => {
