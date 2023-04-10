@@ -3,12 +3,7 @@ import type { ChatGPTAPIOptions, ChatMessage, SendMessageOptions, FetchFn } from
 import { ChatGPTAPI, ChatGPTUnofficialProxyAPI } from "chatgpt";
 import { SocksProxyAgent } from "socks-proxy-agent";
 import fetch from "node-fetch";
-
-export interface SendResponseOptions {
-    status: "success" | "fail";
-    message?: string;
-    data?: any;
-}
+import { sendResponse } from "@/pages/api/[...all]";
 
 export interface ChatContext {
     conversationId?: string;
@@ -106,23 +101,6 @@ export const installChatGPT = async () => {
         api = new ChatGPTUnofficialProxyAPI({ ...options });
         apiModel = "ChatGPTUnofficialProxyAPI";
     }
-};
-
-export const sendResponse = (options: SendResponseOptions) => {
-    if (options.status === "success") {
-        return Promise.resolve({
-            message: options.message ?? null,
-            data: options.data ?? null,
-            status: options.status,
-        });
-    }
-
-    // eslint-disable-next-line prefer-promise-reject-errors
-    return Promise.reject({
-        message: options.message ?? "fail",
-        data: options.data ?? null,
-        status: options.status,
-    });
 };
 
 export const chatReplyProcess = async (

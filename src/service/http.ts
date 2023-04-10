@@ -1,7 +1,7 @@
 import { message } from "antd";
 import { Client, Options, Response } from "web-rest-client";
-import { SendResponseOptions } from "@/service/chatgpt";
 import { LoginInfo, RegisterInfo } from "@/pages/login";
+import { SendResponseOptions } from "@/pages/api/[...all]";
 
 class HttpService extends Client {
     constructor() {
@@ -9,17 +9,24 @@ class HttpService extends Client {
 
         this.responsePlugins.push((res: Response, next: () => void) => {
             const { status, data, statusText } = res;
-            const { msg } = (data as unknown as { msg: string }) || {};
+            const {
+                message: msg,
+                data: resData,
+                status: successStatus,
+            } = (data as unknown as SendResponseOptions) || {};
+            const isSuccess = status === 200 && successStatus === "success";
 
-            if (status !== 200) {
+            if (!isSuccess) {
                 if (msg) {
                     message.error(msg);
                 } else if (statusText) {
                     message.error(`${status} ${statusText}`);
                 }
+            } else {
+                res.data = resData;
             }
 
-            if ((data as unknown as SendResponseOptions)?.status === "fail") {
+            if (successStatus === "fail") {
                 res.status = 999;
             }
 
@@ -32,7 +39,7 @@ class HttpService extends Client {
     }
 
     login(body: LoginInfo) {
-        return this.post("/api/v1/user/login", body);
+        return this.post("/api/v1/user/login", body) as Promise<string>;
     }
 
     sendCode(body: { email: string }) {
@@ -40,7 +47,7 @@ class HttpService extends Client {
     }
 
     register(body: RegisterInfo) {
-        return this.post("/api/v1/user/register", body);
+        return this.post("/api/v1/user/register", body) as Promise<string>;
     }
 }
 

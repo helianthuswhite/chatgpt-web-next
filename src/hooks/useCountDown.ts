@@ -19,7 +19,10 @@ const useCountDown: (initialCount?: number) => CountDown = (initialCount = 60) =
     }, [count]);
 
     const startCount = () => setCount(initialCount);
-    const stopCount = () => clearInterval(intervalRef.current);
+    const stopCount = () => {
+        setCount(0);
+        clearInterval(intervalRef.current);
+    };
 
     return [count, startCount, stopCount];
 };

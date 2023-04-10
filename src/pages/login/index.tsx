@@ -1,10 +1,12 @@
 import Button from "@/components/Button";
 import useCountDown from "@/hooks/useCountDown";
 import http from "@/service/http";
+import { AppStore } from "@/store/App";
 import { Form, Input, message } from "antd";
 import classNames from "classnames";
 import Image from "next/image";
-import { useCallback, useState } from "react";
+import { useRouter } from "next/router";
+import { useCallback, useContext, useState } from "react";
 import Particles from "react-particles";
 import { loadFull } from "tsparticles";
 import type { Engine } from "tsparticles-engine";
@@ -23,8 +25,10 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const [isRegister, setIsRegister] = useState(false);
     const [codeLoading, setCodeLoading] = useState(false);
+    const { setData } = useContext(AppStore);
     const [countdown, startCount] = useCountDown();
     const [form] = Form.useForm();
+    const router = useRouter();
 
     const particlesInit = useCallback(async (engine: Engine) => {
         await loadFull(engine);
@@ -33,8 +37,10 @@ const Login = () => {
     const onFinish = async (info: RegisterInfo) => {
         setLoading(true);
         try {
-            await http[isRegister ? "register" : "login"](info);
+            const token = await http[isRegister ? "register" : "login"](info);
+            setData({ token });
             message.success(isRegister ? "注册成功" : "登录成功" + "，即将跳转...");
+            router.push("/");
         } catch (error) {
             console.error(error);
         }
@@ -64,7 +70,7 @@ const Login = () => {
             <Particles url="/particles.json" init={particlesInit} />
             <div
                 className={classNames(
-                    "w-[400px] max-w-md p-10 rounded-md z-10 bg-opacity-30 border-solid border border-gray-200",
+                    "w-[360px] max-w-md p-10 rounded-md z-10 bg-opacity-30 border-solid border border-gray-200",
                     "backdrop-filter backdrop-blur-sm"
                 )}
             >
@@ -86,7 +92,11 @@ const Login = () => {
                         className={classNames(!isRegister && "mb-2")}
                         rules={[
                             { required: true, message: "密码为空" },
-                            { min: 6, message: "密码长度不能小于6位" },
+                            {
+                                min: 8,
+                                pattern: /^(?=.*[0-9])(?=.*[a-zA-Z])[A-Za-z0-9]+$/,
+                                message: "密码应为8位以上数字和字母",
+                            },
                         ]}
                     >
                         <Input.Password

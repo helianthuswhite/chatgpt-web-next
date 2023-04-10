@@ -4,8 +4,9 @@ import "@/styles/github-markdown.scss";
 import "katex/dist/katex.min.css";
 import "@/styles/text.scss";
 import type { AppProps } from "next/app";
+import AppStoreProvider from "@/store/App";
+import UserStoreProvider from "@/store/User";
 import { ConfigProvider } from "antd";
-import useIsMobile from "@/hooks/useIsMobile";
 
 ConfigProvider.config({
     theme: {
@@ -14,5 +15,11 @@ ConfigProvider.config({
 });
 
 export default function App({ Component, pageProps }: AppProps) {
-    return <Component {...pageProps} />;
+    return (
+        <AppStoreProvider>
+            <UserStoreProvider>
+                <Component {...pageProps} />
+            </UserStoreProvider>
+        </AppStoreProvider>
+    );
 }

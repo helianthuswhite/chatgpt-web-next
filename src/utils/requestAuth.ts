@@ -1,4 +1,4 @@
-import { sendResponse } from "@/service/chatgpt";
+import { sendResponse } from "@/pages/api/[...all]";
 import { NextApiRequest } from "next";
 
 const requestAuth = (req: NextApiRequest) => {
