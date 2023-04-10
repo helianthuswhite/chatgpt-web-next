@@ -4,6 +4,11 @@ import { NextApiRequest } from "next";
 const requestAuth = (req: NextApiRequest) => {
     const tokens = process.env.LOCAL_ACCESS_TOKENS?.split(",");
     const token = req.headers.authorization;
+
+    if (!tokens) {
+        return Promise.resolve();
+    }
+
     if (!token || !tokens?.length) {
         return sendResponse({ status: "fail", message: "No authorization token provided" });
     }

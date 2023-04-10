@@ -1,5 +1,7 @@
 # ChatGPT Web NextJS
 
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/-4ukN3?referralCode=ZtthnC)
+
 ## Introduction
 
 > This project comes from the origin project [chatgpt-web](https://github.com/Chanzhaoyu/chatgpt-web) which is an excellent chatgpt website.
@@ -48,6 +50,9 @@ SOCKS_PROXY_HOST=
 
 # Socks Proxy Port
 SOCKS_PROXY_PORT=
+
+# Simple Authorization Tokens - 'xxxxx,xxxxx'
+LOCAL_ACCESS_TOKENS=
 ```
 
 If you set the correct variables, you can start the project by the `dev` command:
@@ -102,6 +107,7 @@ You may choose what you like and see the official docs for deploying.
 | `API_REVERSE_PROXY`   | Optional, only for `Web API`                | Reverse proxy address for `Web API`. [Details](https://github.com/transitive-bullshit/chatgpt-api#reverse-proxy) |
 | `SOCKS_PROXY_HOST`    | Optional, effective with `SOCKS_PROXY_PORT` | Socks proxy.                                                                                                     |
 | `SOCKS_PROXY_PORT`    | Optional, effective with `SOCKS_PROXY_HOST` | Socks proxy port.                                                                                                |
+| `LOCAL_ACCESS_TOKENS` | Optional                                    | Simple authorization tokens, empty means no auth control.                                                        |
 
 > Note: Changing environment variables in Railway will cause re-deployment.
 
