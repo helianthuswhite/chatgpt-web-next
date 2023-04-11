@@ -5,7 +5,7 @@ const requestAuth = (req: NextApiRequest) => {
     const tokens = process.env.LOCAL_ACCESS_TOKENS?.split(",");
     const token = req.headers.authorization;
 
-    if (!tokens) {
+    if (!process.env.LOCAL_ACCESS_TOKENS) {
         return Promise.resolve();
     }
 

@@ -2,6 +2,8 @@
 
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/-4ukN3?referralCode=ZtthnC)
 
+English | [中文文档](./README-zh_CN.md)
+
 ## Introduction
 
 > This project comes from the origin project [chatgpt-web](https://github.com/Chanzhaoyu/chatgpt-web) which is an excellent chatgpt website.
