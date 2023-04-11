@@ -1,4 +1,5 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import { TOKEN_MAX_AGE, USER_TOKEN } from "@/constants";
 import type { NextApiRequest, NextApiResponse } from "next";
 import httpProxyMiddleware from "next-http-proxy-middleware";
 
@@ -30,7 +31,7 @@ export default async function handler(originReq: NextApiRequest, originRes: Next
         changeOrigin: true,
         selfHandleResponse: true,
         onProxyInit(httpProxy) {
-            httpProxy.on("proxyRes", (proxyRes, _, res) => {
+            httpProxy.on("proxyRes", (proxyRes, req, res) => {
                 let responseData = "";
                 proxyRes.on("data", (chunk) => {
                     responseData += chunk;
@@ -46,6 +47,19 @@ export default async function handler(originReq: NextApiRequest, originRes: Next
                             status: code === 0 ? "success" : "fail",
                         };
                         const transformedResponse = JSON.stringify(transformedData);
+
+                        //  handle login and register, use cookie to auth
+                        if (
+                            code === 0 &&
+                            originalData &&
+                            (req.url?.includes("/login") || req.url?.includes("/register"))
+                        ) {
+                            res.setHeader(
+                                "Set-Cookie",
+                                `${USER_TOKEN}=${originalData}; path=/; Max-Age=${TOKEN_MAX_AGE}; HttpOnly`
+                            );
+                        }
+
                         res.setHeader("Content-Type", "application/json");
                         res.end(transformedResponse);
                     } catch (err) {

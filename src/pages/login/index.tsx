@@ -1,7 +1,6 @@
 import Button from "@/components/Button";
 import useCountDown from "@/hooks/useCountDown";
 import http from "@/service/http";
-import { AppStore } from "@/store/App";
 import { Form, Input, message } from "antd";
 import classNames from "classnames";
 import Image from "next/image";
@@ -25,7 +24,6 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const [isRegister, setIsRegister] = useState(false);
     const [codeLoading, setCodeLoading] = useState(false);
-    const { setData } = useContext(AppStore);
     const [countdown, startCount] = useCountDown();
     const [form] = Form.useForm();
     const router = useRouter();
@@ -37,8 +35,7 @@ const Login = () => {
     const onFinish = async (info: RegisterInfo) => {
         setLoading(true);
         try {
-            const token = await http[isRegister ? "register" : "login"](info);
-            setData({ token });
+            await http[isRegister ? "register" : "login"](info);
             message.success(isRegister ? "注册成功" : "登录成功" + "，即将跳转...");
             router.push("/");
         } catch (error) {
