@@ -11,6 +11,7 @@ interface LocalStorage<T> {
 const storage = <T>(): LocalStorage<T> => ({
     set: (key: string, value: T) => {
         try {
+            if (typeof window === "undefined") return;
             localStorage.setItem(key, JSON.stringify(value));
         } catch (error) {
             console.error("Error saving to localStorage:", error);
@@ -18,6 +19,7 @@ const storage = <T>(): LocalStorage<T> => ({
     },
     get: (key: string) => {
         try {
+            if (typeof window === "undefined") return null;
             const item = localStorage.getItem(key);
             return item ? JSON.parse(item) : null;
         } catch (error) {
@@ -27,6 +29,7 @@ const storage = <T>(): LocalStorage<T> => ({
     },
     remove: (key: string) => {
         try {
+            if (typeof window === "undefined") return;
             localStorage.removeItem(key);
         } catch (error) {
             console.error("Error removing from localStorage:", error);

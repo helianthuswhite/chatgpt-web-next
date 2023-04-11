@@ -3,6 +3,7 @@ import { createContext, Dispatch, SetStateAction, useState } from "react";
 export interface UserInfo {
     avatar: string;
     name: string;
+    email: string;
     description: string;
 }
 
@@ -17,6 +18,7 @@ const User: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [userInfo, setUserInfo] = useState({
         avatar: "/author.jpg",
         name: "helianthuswhite",
+        email: "",
         description:
             'Star on <a href="https://github.com/helianthuswhite/chatgpt-web-next" class="color-[#3050fb]" target="_blank" >Github</a>',
     });

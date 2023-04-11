@@ -3,7 +3,7 @@ import type { ChatGPTAPIOptions, ChatMessage, SendMessageOptions, FetchFn } from
 import { ChatGPTAPI, ChatGPTUnofficialProxyAPI } from "chatgpt";
 import { SocksProxyAgent } from "socks-proxy-agent";
 import fetch from "node-fetch";
-import { sendResponse } from "@/pages/api/[...all]";
+import { sendResponse } from "@/service/server";
 
 export interface ChatContext {
     conversationId?: string;

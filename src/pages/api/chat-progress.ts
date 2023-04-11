@@ -1,5 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { chatReplyProcess, installChatGPT } from "@/service/chatgpt";
+import { fetchServer } from "@/service/server";
 import { ConversationRequest } from "@/store/Chat";
 import requestAuth from "@/utils/requestAuth";
 import { ChatMessage } from "chatgpt";
@@ -20,6 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             res.write(firstChunk ? JSON.stringify(chat) : `\n${JSON.stringify(chat)}`);
             firstChunk = false;
         });
+        await fetchServer("/api/v1/integral/record", req);
     } catch (error) {
         res.write(JSON.stringify(error));
     } finally {

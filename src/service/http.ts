@@ -1,7 +1,7 @@
 import { message } from "antd";
 import { Client, Options, Response } from "web-rest-client";
 import { LoginInfo, RegisterInfo } from "@/pages/login";
-import { SendResponseOptions } from "@/pages/api/[...all]";
+import { SendResponseOptions } from "@/service/server";
 
 class HttpService extends Client {
     constructor() {
@@ -48,6 +48,10 @@ class HttpService extends Client {
 
     register(body: RegisterInfo) {
         return this.post("/api/v1/user/register", body) as Promise<string>;
+    }
+
+    getUserInfo() {
+        return this.get("/api/v1/user/profile");
     }
 }
 

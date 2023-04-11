@@ -1,29 +1,11 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import * as dotenv from "dotenv";
 import { TOKEN_MAX_AGE, USER_TOKEN } from "@/constants";
 import type { NextApiRequest, NextApiResponse } from "next";
 import httpProxyMiddleware from "next-http-proxy-middleware";
+import { sendResponse } from "@/service/server";
 
-export interface SendResponseOptions {
-    status: "success" | "fail";
-    message?: string;
-    data?: any;
-}
-
-export const sendResponse = (options: SendResponseOptions) => {
-    if (options.status === "success") {
-        return Promise.resolve({
-            message: options.message ?? null,
-            data: options.data ?? null,
-            status: options.status,
-        });
-    }
-
-    return Promise.reject({
-        message: options.message ?? "fail",
-        data: options.data ?? null,
-        status: options.status,
-    });
-};
+dotenv.config();
 
 export default async function handler(originReq: NextApiRequest, originRes: NextApiResponse) {
     return httpProxyMiddleware(originReq, originRes, {
