@@ -19,7 +19,12 @@ const ChatPage: React.FC<Props> = ({ userInfo }) => {
     const { userInfo: originUserInfo, setUserInfo } = useContext(UserStore);
 
     useEffect(() => {
-        setUserInfo({ ...originUserInfo, email: userInfo?.email || "" });
+        setUserInfo({
+            ...originUserInfo,
+            email: userInfo?.email || "",
+            inviteCode: userInfo?.inviteCode || "",
+            integral: userInfo?.integral || 0,
+        });
     }, [userInfo]);
 
     return (
@@ -65,7 +70,7 @@ export async function getServerSideProps({ req, res }: NextPageContext) {
     }
 
     try {
-        const userInfo = await fetchServer("/api/v1/user/profile", req);
+        const { data: userInfo } = await fetchServer("/api/v1/user/profile", req);
         return {
             props: {
                 userInfo,

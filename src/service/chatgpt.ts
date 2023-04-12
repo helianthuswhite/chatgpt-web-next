@@ -3,7 +3,7 @@ import type { ChatGPTAPIOptions, ChatMessage, SendMessageOptions, FetchFn } from
 import { ChatGPTAPI, ChatGPTUnofficialProxyAPI } from "chatgpt";
 import { SocksProxyAgent } from "socks-proxy-agent";
 import fetch from "node-fetch";
-import { sendResponse } from "@/service/server";
+import { convertResponseKey, sendResponse } from "@/service/server";
 
 export interface ChatContext {
     conversationId?: string;
@@ -124,16 +124,15 @@ export const chatReplyProcess = async (
             },
         });
 
-        return sendResponse({ status: "success", data: response });
+        return response;
     } catch (error: any) {
         const code = error.statusCode;
         global.console.log(error);
-        if (Reflect.has(ErrorCodeMessage, code))
-            return sendResponse({ status: "fail", message: ErrorCodeMessage[code] });
-        return sendResponse({
-            status: "fail",
-            message: error.message ?? "Please check the back-end console",
-        });
+        if (Reflect.has(ErrorCodeMessage, code)) {
+            return Promise.reject({ message: ErrorCodeMessage[code] });
+        }
+
+        return Promise.reject({ message: error.message ?? "Please check the back-end console" });
     }
 };
 

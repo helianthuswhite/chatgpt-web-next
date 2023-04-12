@@ -1,5 +1,4 @@
 import { IncomingMessage } from "http";
-import { NextResponse } from "next/server";
 import fetch, { RequestInit } from "node-fetch";
 
 export interface SendResponseOptions {

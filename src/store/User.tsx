@@ -5,6 +5,8 @@ export interface UserInfo {
     name: string;
     email: string;
     description: string;
+    integral: number;
+    inviteCode: string;
 }
 
 export interface userStoreInterface {
@@ -19,6 +21,8 @@ const User: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         avatar: "/author.jpg",
         name: "helianthuswhite",
         email: "",
+        integral: 0,
+        inviteCode: "",
         description:
             'Star on <a href="https://github.com/helianthuswhite/chatgpt-web-next" class="color-[#3050fb]" target="_blank" >Github</a>',
     });
