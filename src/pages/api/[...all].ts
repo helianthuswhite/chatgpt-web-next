@@ -45,7 +45,7 @@ export default async function handler(originReq: NextApiRequest, originRes: Next
                         res.setHeader("Content-Type", "application/json");
                         res.end(transformedResponse);
                     } catch (err) {
-                        sendResponse({ status: "fail", message: "Invalid response" });
+                        sendResponse({ status: "fail", message: "Invalid response", code: 500 });
                     }
                 });
             });

@@ -9,7 +9,8 @@ const checkPath = (pathname: string) => {
         pathname.startsWith("/_next/") ||
         StaticFileExtensions.includes(`.${suffix}`) ||
         pathname.includes("/login") ||
-        pathname.includes("/register")
+        pathname.includes("/register") ||
+        pathname.includes("/send_code")
     );
 };
 

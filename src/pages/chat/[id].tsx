@@ -7,7 +7,8 @@ import ChatContent from "./Content";
 import { NextPageContext } from "next";
 import { UserInfo, UserStore } from "@/store/User";
 import { useContext, useEffect } from "react";
-import { fetchServer } from "@/service/server";
+import { fetchServer, SendResponseOptions } from "@/service/server";
+import { USER_TOKEN } from "@/constants";
 
 interface Props {
     userInfo?: UserInfo;
@@ -54,7 +55,7 @@ const ChatPage: React.FC<Props> = ({ userInfo }) => {
     );
 };
 
-export async function getServerSideProps({ req }: NextPageContext) {
+export async function getServerSideProps({ req, res }: NextPageContext) {
     const cookie = req?.headers.cookie;
 
     if (!cookie) {
@@ -71,6 +72,13 @@ export async function getServerSideProps({ req }: NextPageContext) {
             },
         };
     } catch (error) {
+        //  no auth need to redirect
+        if ((error as SendResponseOptions)?.code === 401 && res) {
+            res.setHeader("Set-Cookie", `${USER_TOKEN}=; path=/; Max-Age=0; HttpOnly`);
+            res.writeHead(301, { Location: "/login" });
+            res.end();
+        }
+
         return {
             props: {},
         };

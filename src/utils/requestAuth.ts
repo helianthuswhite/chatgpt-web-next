@@ -1,4 +1,4 @@
-import { sendResponse } from "@/pages/api/[...all]";
+import { sendResponse } from "@/service/server";
 import { NextApiRequest } from "next";
 
 const requestAuth = (req: NextApiRequest) => {
@@ -10,11 +10,15 @@ const requestAuth = (req: NextApiRequest) => {
     }
 
     if (!token || !tokens?.length) {
-        return sendResponse({ status: "fail", message: "No authorization token provided" });
+        return sendResponse({
+            status: "fail",
+            message: "No authorization token provided",
+            code: 401,
+        });
     }
 
     if (!tokens.includes(token)) {
-        return sendResponse({ status: "fail", message: "Invalid authorization token" });
+        return sendResponse({ status: "fail", message: "Invalid authorization token", code: 401 });
     }
 };
 

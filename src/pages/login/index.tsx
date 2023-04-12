@@ -24,7 +24,7 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const [isRegister, setIsRegister] = useState(false);
     const [codeLoading, setCodeLoading] = useState(false);
-    const [countdown, startCount] = useCountDown();
+    const [countdown, startCount, stopCount] = useCountDown();
     const [form] = Form.useForm();
     const router = useRouter();
 
@@ -41,6 +41,7 @@ const Login = () => {
         } catch (error) {
             console.error(error);
         }
+        stopCount();
         setLoading(false);
     };
 
@@ -54,12 +55,11 @@ const Login = () => {
         setCodeLoading(true);
         try {
             await http.sendCode({ email });
+            startCount();
         } catch (error) {
             console.error(error);
         }
         setCodeLoading(false);
-
-        startCount();
     };
 
     return (

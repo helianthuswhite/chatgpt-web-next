@@ -1,9 +1,18 @@
-import { IncomingHttpHeaders } from "http";
+import { IncomingMessage } from "http";
+import { NextResponse } from "next/server";
+import fetch, { RequestInit } from "node-fetch";
 
 export interface SendResponseOptions {
     status: "success" | "fail";
     message?: string;
     data?: any;
+    code?: number;
+}
+
+export interface RPCResponse {
+    code: number;
+    data: any;
+    msg: string;
 }
 
 export const sendResponse = (options: SendResponseOptions) => {
@@ -12,6 +21,7 @@ export const sendResponse = (options: SendResponseOptions) => {
             message: options.message ?? null,
             data: options.data ?? null,
             status: options.status,
+            code: options.code || 0,
         });
     }
 
@@ -19,6 +29,7 @@ export const sendResponse = (options: SendResponseOptions) => {
         message: options.message ?? "fail",
         data: options.data ?? null,
         status: options.status,
+        code: options.code || 0,
     });
 };
 
@@ -45,27 +56,30 @@ export const convertResponseKey = (obj: Object): Object => {
     return obj;
 };
 
-export const fetchServer = async (
-    url: string,
-    req: { headers: IncomingHttpHeaders },
-    options?: RequestInit
-) => {
+export const fetchServer = async (url: string, req: IncomingMessage, options?: RequestInit) => {
     const cookie = req?.headers.cookie || "";
     const cookies = cookie.split(";");
     const authCookie = cookies.find((item) => item.includes("authorization"));
     const authorization = authCookie?.trim().split("=")[1];
 
-    const res = await fetch(new URL(url, process.env.BACKEND_ENDPOINT), {
-        headers: {
-            Authorization: `Bearer ${authorization}`,
-        },
-        ...options,
-    });
-    const { data, code, msg } = await res.json();
+    try {
+        const res = await fetch(new URL(url, process.env.BACKEND_ENDPOINT), {
+            headers: {
+                Authorization: `Bearer ${authorization}`,
+            },
+            method: req.method,
+            ...options,
+        });
+        const { data, code, msg } = (await res.json()) as RPCResponse;
 
-    if (code !== 0) {
-        throw Error(msg);
+        if (code !== 0) {
+            return sendResponse({ status: "fail", message: msg, code });
+        }
+
+        const newData = convertResponseKey(data);
+        return sendResponse({ status: "success", data: newData, message: msg });
+    } catch (error) {
+        const message = (error as { message: string })?.message ?? JSON.stringify(error);
+        return sendResponse({ status: "fail", message, code: 500 });
     }
-
-    return convertResponseKey(data);
 };
