@@ -42,6 +42,10 @@ class HttpService extends Client {
         return this.post("/api/v1/user/login", body) as Promise<string>;
     }
 
+    logout() {
+        return this.post("/api/logout");
+    }
+
     sendCode(body: { email: string }) {
         return this.post("/api/v1/user/verify/send_code", body);
     }

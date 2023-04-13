@@ -2,11 +2,9 @@ import { useContext } from "react";
 import { UserStore } from "@/store/User";
 import Avatar from "@/components/Avatar";
 
-interface Props {
-    image?: boolean;
-}
+interface Props {}
 
-const UserAvatar: React.FC<Props> = ({ image }) => {
+const UserAvatar: React.FC<Props> = () => {
     const { userInfo } = useContext(UserStore);
 
     return (

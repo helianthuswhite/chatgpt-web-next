@@ -1,5 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { chatReplyProcess, installChatGPT } from "@/service/chatgpt";
+import logger from "@/service/logger";
 import { fetchServer } from "@/service/server";
 import { ConversationRequest } from "@/store/Chat";
 import { ChatMessage } from "chatgpt";
@@ -7,6 +8,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     res.setHeader("Content-type", "application/octet-stream");
+    logger.info("chat-progress", req.url, req.body);
 
     try {
         // await requestAuth(req);
@@ -22,6 +24,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             firstChunk = false;
         });
 
+        logger.info("chat-progress", "chatgpt response:", response);
+
         if (response.detail) {
             const { model, usage } = response.detail;
             await fetchServer("/api/v1/integral/record", req, {
@@ -31,8 +35,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     type: "chat",
                 }),
             });
+
+            logger.info("chat-progress", "record integral success");
         }
     } catch (error: any) {
+        logger.error("chat-progress", "chat-progress error:", error);
+
         const response = { status: "fail", message: error.message, code: 500 };
         res.write(JSON.stringify(response));
     } finally {

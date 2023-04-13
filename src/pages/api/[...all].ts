@@ -3,11 +3,15 @@ import * as dotenv from "dotenv";
 import { TOKEN_MAX_AGE, USER_TOKEN } from "@/constants";
 import type { NextApiRequest, NextApiResponse } from "next";
 import httpProxyMiddleware from "next-http-proxy-middleware";
-import { sendResponse } from "@/service/server";
+import { convertRequestKey, sendResponse } from "@/service/server";
+import logger from "@/service/logger";
 
 dotenv.config();
 
 export default async function handler(originReq: NextApiRequest, originRes: NextApiResponse) {
+    originReq.body = convertRequestKey(originReq.body);
+    logger.info("api-proxy", originReq.url, originReq.body);
+
     return httpProxyMiddleware(originReq, originRes, {
         target: process.env.BACKEND_ENDPOINT,
         changeOrigin: true,
@@ -22,6 +26,8 @@ export default async function handler(originReq: NextApiRequest, originRes: Next
                 proxyRes.on("end", () => {
                     try {
                         const data = JSON.parse(responseData);
+                        logger.info("api-proxy", "proxy response:", data);
+
                         const { code, data: originalData, msg } = data;
                         const transformedData = {
                             data: originalData,
@@ -40,11 +46,14 @@ export default async function handler(originReq: NextApiRequest, originRes: Next
                                 "Set-Cookie",
                                 `${USER_TOKEN}=${originalData}; path=/; Max-Age=${TOKEN_MAX_AGE}; HttpOnly`
                             );
+                            logger.error("api-proxy", "request auth error, clear cookie");
                         }
 
                         res.setHeader("Content-Type", "application/json");
                         res.end(transformedResponse);
+                        logger.info("api-proxy", "response to client:", transformedData);
                     } catch (err) {
+                        logger.error("api-proxy", "proxy response error:", err);
                         sendResponse({ status: "fail", message: "Invalid response", code: 500 });
                     }
                 });

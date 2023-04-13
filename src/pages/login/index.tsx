@@ -5,7 +5,7 @@ import { Form, Input, message } from "antd";
 import classNames from "classnames";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import Particles from "react-particles";
 import { loadFull } from "tsparticles";
 import type { Engine } from "tsparticles-engine";
@@ -62,6 +62,19 @@ const Login = () => {
         setCodeLoading(false);
     };
 
+    useEffect(() => {
+        const query = router.query;
+
+        if (query.code) {
+            form.setFieldsValue({ inviteCode: query.code });
+            setIsRegister(true);
+        }
+    }, [router.query]);
+
+    useEffect(() => {
+        form.resetFields();
+    }, [isRegister]);
+
     return (
         <div className="flex h-full items-center justify-center">
             <Particles url="/particles.json" init={particlesInit} />
@@ -103,26 +116,34 @@ const Login = () => {
                     </Form.Item>
 
                     {isRegister && (
-                        <div className="flex items-center mb-4">
-                            <Form.Item
-                                name="code"
-                                className="mb-0 mr-2 flex-1"
-                                rules={[{ required: true, message: "密码为空" }]}
-                            >
+                        <>
+                            <Form.Item name="inviteCode">
                                 <Input
-                                    placeholder="邮箱验证码"
+                                    placeholder="请输入6位邀请码，可为空"
                                     className="rounded text-sm pt-2 pb-2"
                                 />
                             </Form.Item>
-                            <Button
-                                className="h-[38px]"
-                                onClick={sendEmail}
-                                loading={codeLoading}
-                                disabled={!!countdown}
-                            >
-                                {countdown ? `重发（${countdown}秒）` : "发送验证码"}
-                            </Button>
-                        </div>
+                            <div className="flex mb-4">
+                                <Form.Item
+                                    name="code"
+                                    className="mb-0 mr-2 flex-1"
+                                    rules={[{ required: true, message: "密码为空" }]}
+                                >
+                                    <Input
+                                        placeholder="邮箱验证码"
+                                        className="rounded text-sm pt-2 pb-2"
+                                    />
+                                </Form.Item>
+                                <Button
+                                    className="h-[38px]"
+                                    onClick={sendEmail}
+                                    loading={codeLoading}
+                                    disabled={!!countdown}
+                                >
+                                    {countdown ? `重发（${countdown}秒）` : "发送验证码"}
+                                </Button>
+                            </div>
+                        </>
                     )}
 
                     <Form.Item className="mb-2">

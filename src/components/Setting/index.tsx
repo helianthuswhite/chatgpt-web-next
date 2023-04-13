@@ -1,8 +1,11 @@
-import { Col, Input, Modal, Row } from "antd";
+import { Col, message, Modal, Row } from "antd";
 import { useContext, useState } from "react";
 import { AppStore } from "@/store/App";
 import Button from "@/components/Button";
 import { UserStore } from "@/store/User";
+import copyToClipboard from "@/utils/copyToClipboard";
+import http from "@/service/http";
+import { useRouter } from "next/router";
 
 interface Props {
     open: boolean;
@@ -13,6 +16,7 @@ const Setting: React.FC<Props> = ({ open, onCancel }) => {
     const [editToken, setEditToken] = useState(false);
     const { token, setData } = useContext(AppStore);
     const { userInfo } = useContext(UserStore);
+    const router = useRouter();
 
     const onSaveToken = (e: string) => {
         if (!e.trim()) {
@@ -21,6 +25,21 @@ const Setting: React.FC<Props> = ({ open, onCancel }) => {
         }
         setData({ token: e });
         setEditToken(false);
+    };
+
+    const onCopyInviteUrl = async () => {
+        const url = location.origin + "/login?code=" + userInfo.inviteCode;
+        try {
+            await copyToClipboard(url);
+            message.success("复制成功");
+        } catch (error) {
+            message.error("复制失败");
+        }
+    };
+
+    const onLogout = async () => {
+        await http.logout();
+        router.replace("/login");
     };
 
     return (
@@ -70,12 +89,18 @@ const Setting: React.FC<Props> = ({ open, onCancel }) => {
                 </Col>
                 <Col span={18}>
                     <span>{userInfo.inviteCode}</span>
+                    <Button type="link" onClick={onCopyInviteUrl}>
+                        复制邀请链接
+                    </Button>
                 </Col>
                 <Col span={6}>
                     <label>剩余对话次数：</label>
                 </Col>
                 <Col span={18}>
                     <span>{userInfo.integral}</span>
+                </Col>
+                <Col span={24} className="flex justify-center">
+                    <Button onClick={onLogout}>退出登录</Button>
                 </Col>
             </Row>
         </Modal>
