@@ -57,6 +57,10 @@ class HttpService extends Client {
     getUserInfo() {
         return this.get("/api/v1/user/profile");
     }
+
+    getNotice() {
+        return this.get("/api/notice") as Promise<string>;
+    }
 }
 
 const http = new HttpService();

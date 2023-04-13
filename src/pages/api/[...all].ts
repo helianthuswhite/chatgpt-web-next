@@ -3,13 +3,13 @@ import * as dotenv from "dotenv";
 import { TOKEN_MAX_AGE, USER_TOKEN } from "@/constants";
 import type { NextApiRequest, NextApiResponse } from "next";
 import httpProxyMiddleware from "next-http-proxy-middleware";
-import { convertRequestKey, sendResponse } from "@/service/server";
+import { sendResponse } from "@/service/server";
 import logger from "@/service/logger";
 
 dotenv.config();
 
 export default async function handler(originReq: NextApiRequest, originRes: NextApiResponse) {
-    originReq.body = convertRequestKey(originReq.body);
+    // originReq.body = convertRequestKey(originReq.body);
     logger.info("api-proxy", originReq.url, originReq.body);
 
     return httpProxyMiddleware(originReq, originRes, {

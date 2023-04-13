@@ -1,5 +1,5 @@
-import { Col, message, Modal, Row } from "antd";
-import { useContext, useState } from "react";
+import { Alert, Col, message, Modal, Row, Tooltip } from "antd";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { AppStore } from "@/store/App";
 import Button from "@/components/Button";
 import { UserStore } from "@/store/User";
@@ -17,6 +17,16 @@ const Setting: React.FC<Props> = ({ open, onCancel }) => {
     const { token, setData } = useContext(AppStore);
     const { userInfo } = useContext(UserStore);
     const router = useRouter();
+    const [notice, setNotice] = useState("");
+
+    const initNotice = useCallback(async () => {
+        const data = await http.getNotice();
+        setNotice(data);
+    }, []);
+
+    useEffect(() => {
+        initNotice();
+    }, []);
 
     const onSaveToken = (e: string) => {
         if (!e.trim()) {
@@ -53,6 +63,7 @@ const Setting: React.FC<Props> = ({ open, onCancel }) => {
             footer={null}
             width={600}
         >
+            {notice && <Alert className="mb-4" description={notice} type="error" closable />}
             {/* <Row align="middle">
                 <Col span={6}>
                     <label>请求Token：</label>
@@ -98,6 +109,9 @@ const Setting: React.FC<Props> = ({ open, onCancel }) => {
                 </Col>
                 <Col span={18}>
                     <span>{userInfo.integral}</span>
+                    <Tooltip title={notice}>
+                        <Button type="link">如何获取更多次数?</Button>
+                    </Tooltip>
                 </Col>
                 <Col span={24} className="flex justify-center">
                     <Button onClick={onLogout}>退出登录</Button>

@@ -7,6 +7,7 @@ export interface UserInfo {
     description: string;
     integral: number;
     inviteCode: string;
+    nickName?: string;
 }
 
 export interface userStoreInterface {

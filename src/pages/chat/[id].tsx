@@ -21,7 +21,9 @@ const ChatPage: React.FC<Props> = ({ userInfo }) => {
     useEffect(() => {
         setUserInfo({
             ...originUserInfo,
-            email: userInfo?.email || "",
+            name: userInfo?.nickName || originUserInfo.name,
+            avatar: userInfo?.avatar || originUserInfo.avatar,
+            email: userInfo?.email || originUserInfo.email,
             inviteCode: userInfo?.inviteCode || "",
             integral: userInfo?.integral || 0,
         });
@@ -77,8 +79,8 @@ export async function getServerSideProps({ req, res }: NextPageContext) {
             },
         };
     } catch (error) {
-        //  no auth need to redirect
-        if ((error as SendResponseOptions)?.code === 401 && res) {
+        //  if get user info failed, redirect to login page
+        if (res) {
             res.setHeader("Set-Cookie", `${USER_TOKEN}=; path=/; Max-Age=0; HttpOnly`);
             res.writeHead(301, { Location: "/login" });
             res.end();

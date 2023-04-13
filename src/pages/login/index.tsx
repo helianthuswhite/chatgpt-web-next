@@ -72,7 +72,7 @@ const Login = () => {
     }, [router.query]);
 
     useEffect(() => {
-        form.resetFields();
+        form.resetFields(["email", "password", "code"]);
     }, [isRegister]);
 
     return (
