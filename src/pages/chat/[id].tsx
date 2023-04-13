@@ -3,7 +3,7 @@ import { Layout } from "antd";
 import classNames from "classnames";
 import useIsMobile from "@/hooks/useIsMobile";
 import Sidebar from "@/components/Sidebar";
-import ChatContent from "./Content";
+import ChatContent from "@/components/ChatContent";
 import { NextPageContext } from "next";
 import { UserInfo, UserStore } from "@/store/User";
 import { useContext, useEffect } from "react";
