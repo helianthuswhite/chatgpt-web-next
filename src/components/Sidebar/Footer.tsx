@@ -1,13 +1,24 @@
-import { Tooltip } from "antd";
+import { Badge, Tooltip } from "antd";
 import classNames from "classnames";
-import { SettingOutlined } from "@ant-design/icons";
+import { SettingOutlined, SoundFilled } from "@ant-design/icons";
 import UserAvatar from "@/components/UserAvatar";
 import Button from "@/components/Button";
 import Setting from "@/components/Setting";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import http from "@/service/http";
 
 const Footer: React.FC = () => {
     const [settingOpen, setSettingOpen] = useState(false);
+    const [notice, setNotice] = useState("");
+
+    const initNotice = useCallback(async () => {
+        const data = await http.getNotice();
+        setNotice(data);
+    }, []);
+
+    useEffect(() => {
+        initNotice();
+    }, [initNotice]);
 
     return (
         <footer
@@ -28,7 +39,7 @@ const Footer: React.FC = () => {
             <div className="flex-1 flex-shrink-0 overflow-hidden">
                 <UserAvatar />
             </div>
-            <Tooltip title="设置">
+            <Badge count={notice ? <SoundFilled className="text-red-500 animate-pulse" /> : null}>
                 <Button
                     type="text"
                     shape="circle"
@@ -37,8 +48,8 @@ const Footer: React.FC = () => {
                 >
                     <SettingOutlined />
                 </Button>
-            </Tooltip>
-            <Setting open={settingOpen} onCancel={() => setSettingOpen(false)} />
+            </Badge>
+            <Setting open={settingOpen} notice={notice} onCancel={() => setSettingOpen(false)} />
         </footer>
     );
 };

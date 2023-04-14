@@ -2,6 +2,7 @@ import { message } from "antd";
 import { Client, Options, Response } from "web-rest-client";
 import { LoginInfo, RegisterInfo } from "@/pages/login";
 import { SendResponseOptions } from "@/service/server";
+import { UserInfo } from "@/store/User";
 
 class HttpService extends Client {
     constructor() {
@@ -55,11 +56,15 @@ class HttpService extends Client {
     }
 
     getUserInfo() {
-        return this.get("/api/v1/user/profile");
+        return this.get("/api/v1/user/profile") as Promise<UserInfo>;
     }
 
     getNotice() {
         return this.get("/api/notice") as Promise<string>;
+    }
+
+    recharget(body: { key: string }) {
+        return this.post("/api/v1/integral/recharge", body);
     }
 }
 

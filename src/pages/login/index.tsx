@@ -69,11 +69,11 @@ const Login = () => {
             form.setFieldsValue({ inviteCode: query.code });
             setIsRegister(true);
         }
-    }, [router.query]);
+    }, [form, router.query]);
 
     useEffect(() => {
         form.resetFields(["email", "password", "code"]);
-    }, [isRegister]);
+    }, [form, isRegister]);
 
     return (
         <div className="flex h-full items-center justify-center">

@@ -11,6 +11,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     logger.info("chat-progress", req.url, req.body);
 
     try {
+        await fetchServer("/api/v1/integral/record", req, {
+            body: JSON.stringify({
+                model: "gpt-3.5-turbo-0301",
+                size: 10,
+                type: "chat",
+            }),
+        });
+
+        logger.info("chat-progress", "record integral success");
+
         // await requestAuth(req);
         await installChatGPT();
         const { prompt, options = {} } = req.body as {
@@ -26,18 +36,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         logger.info("chat-progress", "chatgpt response:", response);
 
-        if (response.detail) {
-            const { model, usage } = response.detail;
-            await fetchServer("/api/v1/integral/record", req, {
-                body: JSON.stringify({
-                    model,
-                    size: usage?.total_tokens,
-                    type: "chat",
-                }),
-            });
+        // if (response.detail) {
+        //     const { model, usage } = response.detail;
+        //     await fetchServer("/api/v1/integral/record", req, {
+        //         body: JSON.stringify({
+        //             model,
+        //             size: usage?.total_tokens,
+        //             type: "chat",
+        //         }),
+        //     });
 
-            logger.info("chat-progress", "record integral success");
-        }
+        //     logger.info("chat-progress", "record integral success");
+        // }
     } catch (error: any) {
         logger.error("chat-progress", "chat-progress error:", error);
 

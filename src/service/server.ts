@@ -79,19 +79,22 @@ export const convertRequestKey = (obj: Object): Object => {
     return obj;
 };
 
-export const fetchServer = async (url: string, req: IncomingMessage, options?: RequestInit) => {
+export const getAuthHeader = (req: IncomingMessage) => {
     const cookie = req?.headers.cookie || "";
     const cookies = cookie.split(";");
     const authCookie = cookies.find((item) => item.includes("authorization"));
     const authorization = authCookie?.trim().split("=")[1];
+    return {
+        Authorization: `Bearer ${authorization}`,
+    };
+};
 
+export const fetchServer = async (url: string, req: IncomingMessage, options?: RequestInit) => {
     logger.info("fetch-server", url, options);
 
     try {
         const res = await fetch(new URL(url, process.env.BACKEND_ENDPOINT), {
-            headers: {
-                Authorization: `Bearer ${authorization}`,
-            },
+            headers: getAuthHeader(req),
             method: req.method,
             ...options,
         });

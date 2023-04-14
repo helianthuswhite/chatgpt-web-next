@@ -3,7 +3,7 @@ import * as dotenv from "dotenv";
 import { TOKEN_MAX_AGE, USER_TOKEN } from "@/constants";
 import type { NextApiRequest, NextApiResponse } from "next";
 import httpProxyMiddleware from "next-http-proxy-middleware";
-import { sendResponse } from "@/service/server";
+import { getAuthHeader, sendResponse } from "@/service/server";
 import logger from "@/service/logger";
 
 dotenv.config();
@@ -11,6 +11,12 @@ dotenv.config();
 export default async function handler(originReq: NextApiRequest, originRes: NextApiResponse) {
     // originReq.body = convertRequestKey(originReq.body);
     logger.info("api-proxy", originReq.url, originReq.body);
+
+    const authHeader = getAuthHeader(originReq);
+    originReq.headers = {
+        ...originReq.headers,
+        ...authHeader,
+    };
 
     return httpProxyMiddleware(originReq, originRes, {
         target: process.env.BACKEND_ENDPOINT,

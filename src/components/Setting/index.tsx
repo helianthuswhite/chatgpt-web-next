@@ -1,4 +1,4 @@
-import { Alert, Col, message, Modal, Row, Tooltip } from "antd";
+import { Alert, Col, Input, message, Modal, Popconfirm, Row } from "antd";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { AppStore } from "@/store/App";
 import Button from "@/components/Button";
@@ -6,27 +6,29 @@ import { UserStore } from "@/store/User";
 import copyToClipboard from "@/utils/copyToClipboard";
 import http from "@/service/http";
 import { useRouter } from "next/router";
+import { ReloadOutlined } from "@ant-design/icons";
 
 interface Props {
     open: boolean;
+    notice?: string;
     onCancel: () => void;
 }
 
-const Setting: React.FC<Props> = ({ open, onCancel }) => {
+const Setting: React.FC<Props> = ({ open, onCancel, notice }) => {
     const [editToken, setEditToken] = useState(false);
     const { token, setData } = useContext(AppStore);
-    const { userInfo } = useContext(UserStore);
+    const { userInfo, refreshUserInfo } = useContext(UserStore);
     const router = useRouter();
-    const [notice, setNotice] = useState("");
-
-    const initNotice = useCallback(async () => {
-        const data = await http.getNotice();
-        setNotice(data);
-    }, []);
+    const [rechargeOpen, setRechargeOpen] = useState(false);
+    const [rechargeCode, setChargeCode] = useState("");
+    const [rechargeLoading, setRechargeLoading] = useState(false);
 
     useEffect(() => {
-        initNotice();
-    }, []);
+        if (open) {
+            refreshUserInfo();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [open]);
 
     const onSaveToken = (e: string) => {
         if (!e.trim()) {
@@ -50,6 +52,18 @@ const Setting: React.FC<Props> = ({ open, onCancel }) => {
     const onLogout = async () => {
         await http.logout();
         router.replace("/login");
+    };
+
+    const onReCharge = async () => {
+        setRechargeLoading(true);
+        try {
+            await http.recharget({ key: rechargeCode });
+            await refreshUserInfo();
+            setRechargeOpen(false);
+        } catch (error) {
+            console.error(error);
+        }
+        setRechargeLoading(false);
     };
 
     return (
@@ -109,9 +123,26 @@ const Setting: React.FC<Props> = ({ open, onCancel }) => {
                 </Col>
                 <Col span={18}>
                     <span>{userInfo.integral}</span>
-                    <Tooltip title={notice}>
-                        <Button type="link">如何获取更多次数?</Button>
-                    </Tooltip>
+                    <Popconfirm
+                        icon={null}
+                        title={
+                            <Input
+                                value={rechargeCode}
+                                placeholder="请输入充值密钥"
+                                onChange={(e) => setChargeCode(e.target.value)}
+                            />
+                        }
+                        open={rechargeOpen}
+                        cancelText="取消"
+                        okText="确认"
+                        onConfirm={onReCharge}
+                        onCancel={() => setRechargeOpen(false)}
+                        okButtonProps={{ loading: rechargeLoading }}
+                    >
+                        <Button type="link" onClick={() => setRechargeOpen(!rechargeOpen)}>
+                            增加次数
+                        </Button>
+                    </Popconfirm>
                 </Col>
                 <Col span={24} className="flex justify-center">
                     <Button onClick={onLogout}>退出登录</Button>

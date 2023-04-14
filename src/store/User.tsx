@@ -1,3 +1,4 @@
+import http from "@/service/http";
 import { createContext, Dispatch, SetStateAction, useState } from "react";
 
 export interface UserInfo {
@@ -12,6 +13,7 @@ export interface UserInfo {
 
 export interface userStoreInterface {
     userInfo: UserInfo;
+    refreshUserInfo: () => Promise<void>;
     setUserInfo: Dispatch<SetStateAction<UserInfo>>;
 }
 
@@ -27,7 +29,17 @@ const User: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         description:
             'Star on <a href="https://github.com/helianthuswhite/chatgpt-web-next" class="color-[#3050fb]" target="_blank" >Github</a>',
     });
-    return <UserStore.Provider value={{ userInfo, setUserInfo }}>{children}</UserStore.Provider>;
+
+    const refreshUserInfo = async () => {
+        const data = await http.getUserInfo();
+        setUserInfo({ ...userInfo, ...data, name: data.nickName || "" });
+    };
+
+    return (
+        <UserStore.Provider value={{ userInfo, refreshUserInfo, setUserInfo }}>
+            {children}
+        </UserStore.Provider>
+    );
 };
 
 export default User;
