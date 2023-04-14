@@ -77,7 +77,14 @@ const Setting: React.FC<Props> = ({ open, onCancel, notice }) => {
             footer={null}
             width={600}
         >
-            {notice && <Alert className="mb-4" description={notice} type="error" closable />}
+            {notice && (
+                <Alert
+                    className="mb-4"
+                    description={<div dangerouslySetInnerHTML={{ __html: notice }} />}
+                    type="error"
+                    closable
+                />
+            )}
             {/* <Row align="middle">
                 <Col span={6}>
                     <label>请求Token：</label>
