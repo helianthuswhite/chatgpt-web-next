@@ -36,9 +36,12 @@ const ChatPage: React.FC<Props> = ({ userInfo, notice }) => {
     }, [userInfo]);
 
     useEffect(() => {
-        if (notice && !noNotice) {
+        if (notice) {
             setNotice(notice);
-            setShowNotice(true);
+
+            if (!noNotice) {
+                setShowNotice(true);
+            }
         }
     }, [notice, noNotice]);
 
