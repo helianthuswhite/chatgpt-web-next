@@ -4,12 +4,16 @@ import { LoginInfo, RegisterInfo } from "@/pages/login";
 import { SendResponseOptions } from "@/service/server";
 import { UserInfo } from "@/store/User";
 
+interface ReuqestOptions extends Omit<Options, "url" | "method"> {
+    silent?: boolean;
+}
+
 class HttpService extends Client {
     constructor() {
         super();
 
         this.responsePlugins.push((res: Response, next: () => void) => {
-            const { status, data, statusText } = res;
+            const { status, data, statusText, config } = res;
             const {
                 message: msg,
                 data: resData,
@@ -17,7 +21,7 @@ class HttpService extends Client {
             } = (data as unknown as SendResponseOptions) || {};
             const isSuccess = status === 200 && successStatus === "success";
 
-            if (!isSuccess) {
+            if (!isSuccess && !config.silent) {
                 if (msg) {
                     message.error(msg);
                 } else if (statusText) {
@@ -35,7 +39,7 @@ class HttpService extends Client {
         });
     }
 
-    fetchChatAPIProgress(body: any, options: Omit<Options, "url" | "method">) {
+    fetchChatAPIProgress(body: any, options: ReuqestOptions) {
         return this.post("/api/chat-progress", body, options);
     }
 

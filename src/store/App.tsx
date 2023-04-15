@@ -8,9 +8,12 @@ export interface AppStorage {
     theme?: Theme;
     hasContext?: boolean;
     token?: string;
+    noNotice?: boolean;
 }
 
 export interface appStoreInterface extends AppStorage {
+    notice: string;
+    setNotice: Dispatch<SetStateAction<string>>;
     setData: (e: AppStorage) => void;
     sidebarCollapsed: boolean;
     setSidebarCollapsed: Dispatch<SetStateAction<boolean>>;
@@ -25,11 +28,13 @@ const defaultValue = appStorage.get(LOCAL_APP_NAME) || {
     theme: "light",
     hasContext: true,
     token: "",
+    noNotice: false,
 };
 
 const App: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
     const [state, setState] = useState(defaultValue);
+    const [notice, setNotice] = useState("");
     const isMobile = useIsMobile();
 
     const setData = (e: AppStorage) => {
@@ -46,6 +51,8 @@ const App: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             value={{
                 ...state,
                 setData,
+                notice,
+                setNotice,
                 sidebarCollapsed,
                 setSidebarCollapsed,
             }}

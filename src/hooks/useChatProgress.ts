@@ -43,6 +43,7 @@ const useChatProgress = (responding: boolean, setResponding: (e: boolean) => voi
                     headers: {
                         authorization: token,
                     },
+                    silent: true,
                     onDownloadProgress: (
                         progressEvent: ProgressEvent<XMLHttpRequestEventTarget>
                     ) => {

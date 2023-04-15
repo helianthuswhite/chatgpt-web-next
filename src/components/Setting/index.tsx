@@ -81,7 +81,7 @@ const Setting: React.FC<Props> = ({ open, onCancel, notice }) => {
                 <Alert
                     className="mb-4"
                     description={<div dangerouslySetInnerHTML={{ __html: notice }} />}
-                    type="error"
+                    type="success"
                     closable
                 />
             )}

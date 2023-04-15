@@ -1,24 +1,16 @@
-import { Badge, Tooltip } from "antd";
+import { Badge } from "antd";
 import classNames from "classnames";
 import { SettingOutlined, SoundFilled } from "@ant-design/icons";
 import UserAvatar from "@/components/UserAvatar";
 import Button from "@/components/Button";
 import Setting from "@/components/Setting";
-import { useCallback, useEffect, useState } from "react";
-import http from "@/service/http";
+import { useContext, useState } from "react";
+import { AppStore } from "@/store/App";
+import ClientOnly from "@/components/ClientOnly";
 
 const Footer: React.FC = () => {
     const [settingOpen, setSettingOpen] = useState(false);
-    const [notice, setNotice] = useState("");
-
-    const initNotice = useCallback(async () => {
-        const data = await http.getNotice();
-        setNotice(data);
-    }, []);
-
-    useEffect(() => {
-        initNotice();
-    }, [initNotice]);
+    const { notice } = useContext(AppStore);
 
     return (
         <footer
@@ -39,16 +31,20 @@ const Footer: React.FC = () => {
             <div className="flex-1 flex-shrink-0 overflow-hidden">
                 <UserAvatar />
             </div>
-            <Badge count={notice ? <SoundFilled className="text-red-500 animate-pulse" /> : null}>
-                <Button
-                    type="text"
-                    shape="circle"
-                    className="flex text-xl text-[#4f555e] dark:text-white justify-center"
-                    onClick={() => setSettingOpen(true)}
+            <ClientOnly>
+                <Badge
+                    count={notice ? <SoundFilled className="text-red-500 animate-pulse" /> : null}
                 >
-                    <SettingOutlined />
-                </Button>
-            </Badge>
+                    <Button
+                        type="text"
+                        shape="circle"
+                        className="flex text-xl text-[#4f555e] dark:text-white justify-center"
+                        onClick={() => setSettingOpen(true)}
+                    >
+                        <SettingOutlined />
+                    </Button>
+                </Badge>
+            </ClientOnly>
             <Setting open={settingOpen} notice={notice} onCancel={() => setSettingOpen(false)} />
         </footer>
     );

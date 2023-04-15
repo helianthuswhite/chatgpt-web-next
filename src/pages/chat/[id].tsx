@@ -1,22 +1,27 @@
 import ChatStoreProvider from "@/store/Chat";
-import { Layout } from "antd";
+import { Alert, Checkbox, Layout, Modal } from "antd";
 import classNames from "classnames";
 import useIsMobile from "@/hooks/useIsMobile";
 import Sidebar from "@/components/Sidebar";
 import ChatContent from "@/components/ChatContent";
 import { NextPageContext } from "next";
 import { UserInfo, UserStore } from "@/store/User";
-import { useContext, useEffect } from "react";
-import { fetchServer, SendResponseOptions } from "@/service/server";
+import { useContext, useEffect, useState } from "react";
+import { fetchServer } from "@/service/server";
 import { USER_TOKEN } from "@/constants";
+import { AppStore } from "@/store/App";
+import Button from "@/components/Button";
 
 interface Props {
     userInfo?: UserInfo;
+    notice?: string;
 }
 
-const ChatPage: React.FC<Props> = ({ userInfo }) => {
+const ChatPage: React.FC<Props> = ({ userInfo, notice }) => {
     const isMobile = useIsMobile();
     const { userInfo: originUserInfo, setUserInfo } = useContext(UserStore);
+    const { setNotice, noNotice, setData } = useContext(AppStore);
+    const [showNotice, setShowNotice] = useState(false);
 
     useEffect(() => {
         setUserInfo({
@@ -29,6 +34,13 @@ const ChatPage: React.FC<Props> = ({ userInfo }) => {
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userInfo]);
+
+    useEffect(() => {
+        if (notice && !noNotice) {
+            setNotice(notice);
+            setShowNotice(true);
+        }
+    }, [notice, noNotice]);
 
     return (
         <ChatStoreProvider>
@@ -59,6 +71,24 @@ const ChatPage: React.FC<Props> = ({ userInfo }) => {
                     </Layout>
                 </div>
             </div>
+            <Modal footer={null} closable={false} open={showNotice} width={600}>
+                <Alert
+                    className="mb-4"
+                    description={<div dangerouslySetInnerHTML={{ __html: notice || "" }} />}
+                    type="success"
+                />
+                <div className="flex items-center justify-end">
+                    <Checkbox
+                        checked={noNotice}
+                        onChange={(e) => setData({ noNotice: e.target.checked })}
+                    >
+                        不再弹出
+                    </Checkbox>
+                    <Button type="primary" className="ml-4" onClick={() => setShowNotice(false)}>
+                        我知道了
+                    </Button>
+                </div>
+            </Modal>
         </ChatStoreProvider>
     );
 };
@@ -77,6 +107,7 @@ export async function getServerSideProps({ req, res }: NextPageContext) {
         return {
             props: {
                 userInfo,
+                notice: process.env.NOTICE,
             },
         };
     } catch (error) {
