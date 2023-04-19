@@ -1,151 +1,182 @@
 import * as dotenv from "dotenv";
-import type { ChatGPTAPIOptions, ChatMessage, SendMessageOptions, FetchFn } from "chatgpt";
-import { ChatGPTAPI, ChatGPTUnofficialProxyAPI } from "chatgpt";
-import { SocksProxyAgent } from "socks-proxy-agent";
 import fetch from "node-fetch";
-import { convertResponseKey, sendResponse } from "@/service/server";
+import Keyv from "keyv";
+import QuickLRU from "quick-lru";
+import { get_encoding } from "@dqbd/tiktoken";
+import { v4 as uuidv4 } from "uuid";
+import logger from "@/service/logger";
+import { getAuthHeader, sendResponse } from "@/service/server";
+import { NextApiRequest, NextApiResponse } from "next";
+
+export interface ChatMessage {
+    role: string;
+    content: string;
+    parentMessageId?: string;
+    messageId: string;
+}
 
 export interface ChatContext {
-    conversationId?: string;
     parentMessageId?: string;
 }
 
-export interface ChatGPTUnofficialProxyAPIOptions {
-    accessToken: string;
-    apiReverseProxyUrl?: string;
-    model?: string;
-    debug?: boolean;
-    headers?: Record<string, string>;
-    fetch?: FetchFn;
-}
-
-export interface ModelConfig {
-    apiModel?: ApiModel;
-    reverseProxy?: string;
-    timeoutMs?: number;
-    socksProxy?: string;
-}
-
-export type ApiModel = "ChatGPTAPI" | "ChatGPTUnofficialProxyAPI" | undefined;
-
-const ErrorCodeMessage: Record<string, string> = {
-    401: "[OpenAI] 提供错误的API密钥 | Incorrect API key provided",
-    403: "[OpenAI] 服务器拒绝访问，请稍后再试 | Server refused to access, please try again later",
-    502: "[OpenAI] 错误的网关 |  Bad Gateway",
-    503: "[OpenAI] 服务器繁忙，请稍后再试 | Server is busy, please try again later",
-    504: "[OpenAI] 网关超时 | Gateway Time-out",
-    500: "[OpenAI] 服务器繁忙，请稍后再试 | Internal Server Error",
-};
-
 dotenv.config();
 
-const timeoutMs: number = !isNaN(+process.env.TIMEOUT_MS) ? +process.env.TIMEOUT_MS : 30 * 1000;
-
-let apiModel: ApiModel;
-let api: ChatGPTAPI | ChatGPTUnofficialProxyAPI;
-
-export const installChatGPT = async () => {
-    if (api) {
-        return;
-    }
-
-    if (!process.env.OPENAI_API_KEY && !process.env.OPENAI_ACCESS_TOKEN)
-        throw new Error("Missing OPENAI_API_KEY or OPENAI_ACCESS_TOKEN environment variable");
-
-    // More Info: https://github.com/transitive-bullshit/chatgpt-api
-    if (process.env.OPENAI_API_KEY) {
-        const OPENAI_API_MODEL = process.env.OPENAI_API_MODEL;
-        const model =
-            typeof OPENAI_API_MODEL === "string" && OPENAI_API_MODEL.length > 0
-                ? OPENAI_API_MODEL
-                : "gpt-3.5-turbo";
-
-        const options: ChatGPTAPIOptions = {
-            apiKey: process.env.OPENAI_API_KEY,
-            completionParams: { model },
-            debug: false,
-        };
-
-        if (process.env.OPENAI_API_BASE_URL && process.env.OPENAI_API_BASE_URL.trim().length > 0)
-            options.apiBaseUrl = process.env.OPENAI_API_BASE_URL;
-
-        if (process.env.SOCKS_PROXY_HOST && process.env.SOCKS_PROXY_PORT) {
-            const agent = new SocksProxyAgent({
-                hostname: process.env.SOCKS_PROXY_HOST,
-                port: process.env.SOCKS_PROXY_PORT,
-            });
-            // @ts-ignore
-            options.fetch = (url, options) => fetch(url, { agent, ...options });
-        }
-
-        api = new ChatGPTAPI({ ...options });
-        apiModel = "ChatGPTAPI";
-    } else {
-        const options: ChatGPTUnofficialProxyAPIOptions = {
-            accessToken: process.env.OPENAI_ACCESS_TOKEN,
-            debug: false,
-        };
-
-        if (process.env.SOCKS_PROXY_HOST && process.env.SOCKS_PROXY_PORT) {
-            const agent = new SocksProxyAgent({
-                hostname: process.env.SOCKS_PROXY_HOST,
-                port: process.env.SOCKS_PROXY_PORT,
-            });
-            // @ts-ignore
-            options.fetch = (url, options) => fetch(url, { agent, ...options });
-        }
-
-        if (process.env.API_REVERSE_PROXY)
-            options.apiReverseProxyUrl = process.env.API_REVERSE_PROXY;
-
-        api = new ChatGPTUnofficialProxyAPI({ ...options });
-        apiModel = "ChatGPTUnofficialProxyAPI";
-    }
+const maxModelTokens = 4000;
+const maxResponseTokens = 1000;
+const maxMessageCount = 10;
+const systemMessage = {
+    role: "system",
+    messageId: uuidv4(),
+    content: `You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.\nKnowledge cutoff: 2021-09-01\nCurrent date: ${
+        new Date().toISOString().split("T")[0]
+    }`,
 };
 
-export const chatReplyProcess = async (
-    message: string,
-    lastContext?: { conversationId?: string; parentMessageId?: string },
-    process?: (chat: ChatMessage) => void
-) => {
+const messageStore = new Keyv<ChatMessage, any>({
+    store: new QuickLRU<string, ChatMessage>({ maxSize: 10000 }),
+});
+const tokenizer = get_encoding("cl100k_base");
+
+export const getTokenCount = (text: string) => {
+    return tokenizer.encode(text.replace(/<\|endoftext\|>/g, "")).length;
+};
+
+export const buildMessage = async (message: ChatMessage, count = 0) => {
+    const userLabel = "User";
+    const assistantLabel = "ChatGPT";
+    const maxNumTokens = maxModelTokens - maxResponseTokens;
+    const { parentMessageId, role, content, messageId } = message;
+    const currentMessage = {
+        role,
+        content,
+        messageId,
+    };
+    const messages: ChatMessage[] = parentMessageId
+        ? [currentMessage]
+        : [currentMessage, systemMessage];
+    count += parentMessageId ? 1 : 2;
+
+    if (parentMessageId && count < maxMessageCount) {
+        const parentMessage = await messageStore.get(parentMessageId);
+        if (parentMessage) {
+            const { messages: preMessages } = await buildMessage(parentMessage, count);
+            messages.push(...preMessages);
+        }
+    }
+
+    const prompt = messages
+        .reduce((prompt, message) => {
+            switch (message.role) {
+                case "system":
+                    return prompt.concat([`Instructions:\n${message.content}`]);
+                case "user":
+                    return prompt.concat([`${userLabel}:\n${message.content}`]);
+                default:
+                    return prompt.concat([`${assistantLabel}:\n${message.content}`]);
+            }
+        }, [] as string[])
+        .join("\n\n");
+
+    const numTokens = getTokenCount(prompt);
+
+    const maxTokens = Math.max(1, Math.min(maxModelTokens - numTokens, maxResponseTokens));
+
+    if (numTokens > maxNumTokens) {
+        logger.error("chatgpt", "Prompt is too long ", numTokens);
+    }
+
+    return { messages, maxTokens, numTokens };
+};
+
+export const chatReplyProcess = async (req: NextApiRequest, res: NextApiResponse) => {
     try {
-        let options: SendMessageOptions = { timeoutMs };
+        const { prompt, options = {} } = req.body as {
+            prompt: string;
+            options?: ChatContext;
+        };
 
-        if (lastContext) {
-            if (apiModel === "ChatGPTAPI")
-                options = { parentMessageId: lastContext.parentMessageId };
-            else options = { ...lastContext };
+        const messageId = uuidv4();
+        const chatMessage: ChatMessage = {
+            role: "user",
+            messageId,
+            parentMessageId: options?.parentMessageId,
+            content: prompt,
+        };
+        const { messages, maxTokens } = await buildMessage(chatMessage);
+
+        const response = await fetch(
+            new URL("/api/v1/openai/v1/chat/completions", process.env.BACKEND_ENDPOINT),
+            {
+                method: req.method,
+                headers: getAuthHeader(req),
+                body: JSON.stringify({
+                    messages: messages.reverse(),
+                    maxTokens,
+                    model: "gpt-3.5-turbo",
+                    temperature: 0.8,
+                    topP: 1,
+                    presencePenalty: 1,
+                    stream: true,
+                }),
+            }
+        );
+
+        if (!response.ok) {
+            let reason: string;
+
+            try {
+                reason = await response.text();
+            } catch (err) {
+                reason = response.statusText;
+            }
+
+            const msg = `ChatGPT error ${response.status}: ${reason}`;
+            throw { message: msg, code: response.status };
         }
 
-        const response = await api.sendMessage(message, {
-            ...options,
-            onProgress: (partialResponse) => {
-                process?.(partialResponse);
-            },
-        });
+        //  if the server response as json
+        if (response.headers.get("content-type") === "application/json") {
+            return await response.json();
+        }
 
-        return response;
+        //  default the server response is stream
+        let chunks = "";
+        let first = true;
+        const result = {
+            role: "assistant",
+            id: uuidv4(),
+            text: chunks,
+        };
+        if (response.body) {
+            try {
+                for await (const chunk of response.body) {
+                    chunks += chunk.toString();
+                    result.text = chunks;
+                    const resultStr = JSON.stringify(result);
+                    res.write(first ? resultStr : `\n${resultStr}`);
+                    first = false;
+                }
+            } catch (err) {
+                const msg = `ChatGPT error: ${err}`;
+                throw { message: msg };
+            }
+        }
+
+        await Promise.all([
+            messageStore.set(result.id, {
+                role: result.role,
+                content: result.text,
+                messageId: result.id,
+                parentMessageId: messageId,
+            }),
+            messageStore.set(chatMessage.messageId, chatMessage),
+        ]);
+
+        logger.info("chatgpt", "ChatGPT response success");
     } catch (error: any) {
-        const code = error.statusCode;
-        global.console.log(error);
-        if (Reflect.has(ErrorCodeMessage, code)) {
-            return Promise.reject({ message: ErrorCodeMessage[code] });
-        }
-
-        return Promise.reject({ message: error.message ?? "Please check the back-end console" });
+        const code = error.code || 500;
+        const msg = error.message ?? "Please check the back-end console";
+        logger.error("chatgpt", msg);
+        return sendResponse({ status: "fail", message: msg, code });
     }
 };
-
-export const chatConfig = () =>
-    sendResponse({
-        status: "success",
-        data: {
-            apiModel,
-            reverseProxy: process.env.API_REVERSE_PROXY,
-            timeoutMs,
-            socksProxy:
-                process.env.SOCKS_PROXY_HOST && process.env.SOCKS_PROXY_PORT
-                    ? `${process.env.SOCKS_PROXY_HOST}:${process.env.SOCKS_PROXY_PORT}`
-                    : "-",
-        } as ModelConfig,
-    });

@@ -1,9 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import { chatReplyProcess, installChatGPT } from "@/service/chatgpt";
+import { chatReplyProcess } from "@/service/chatgpt";
 import logger from "@/service/logger";
-import { fetchServer } from "@/service/server";
-import { ConversationRequest } from "@/store/Chat";
-import { ChatMessage } from "chatgpt";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -11,47 +8,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     logger.info("chat-progress", req.url, req.body);
 
     try {
-        await fetchServer("/api/v1/integral/record", req, {
-            body: JSON.stringify({
-                model: "gpt-3.5-turbo-0301",
-                size: 10,
-                type: "chat",
-            }),
-        });
-
-        logger.info("chat-progress", "record integral success");
-
-        // await requestAuth(req);
-        await installChatGPT();
-        const { prompt, options = {} } = req.body as {
-            prompt: string;
-            options?: ConversationRequest;
-        };
-        let firstChunk = true;
-
-        const response = await chatReplyProcess(prompt, options, (chat: ChatMessage) => {
-            res.write(firstChunk ? JSON.stringify(chat) : `\n${JSON.stringify(chat)}`);
-            firstChunk = false;
-        });
-
-        logger.info("chat-progress", "chatgpt response:", response);
-
-        // if (response.detail) {
-        //     const { model, usage } = response.detail;
-        //     await fetchServer("/api/v1/integral/record", req, {
-        //         body: JSON.stringify({
-        //             model,
-        //             size: usage?.total_tokens,
-        //             type: "chat",
-        //         }),
-        //     });
-
-        //     logger.info("chat-progress", "record integral success");
-        // }
+        await chatReplyProcess(req, res);
     } catch (error: any) {
         logger.error("chat-progress", "chat-progress error:", error);
 
-        const response = { status: "fail", message: error.message, code: 500 };
+        const response = { status: "fail", message: error.message, code: error.code || 500 };
+        res.setHeader("Content-type", "application/json");
         res.write(JSON.stringify(response));
     } finally {
         res.end();

@@ -1,5 +1,5 @@
 import React, { CSSProperties } from "react";
-import { Scrollbars } from "react-custom-scrollbars";
+import { Scrollbars } from "react-custom-scrollbars-2";
 import ClientOnly from "@/components/ClientOnly";
 
 interface Props {

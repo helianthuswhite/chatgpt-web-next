@@ -21,11 +21,13 @@ class HttpService extends Client {
             } = (data as unknown as SendResponseOptions) || {};
             const isSuccess = status === 200 && successStatus === "success";
 
-            if (!isSuccess && !config.silent) {
-                if (msg) {
-                    message.error(msg);
-                } else if (statusText) {
-                    message.error(`${status} ${statusText}`);
+            if (!isSuccess) {
+                if (!config.silent) {
+                    if (msg) {
+                        message.error(msg);
+                    } else if (statusText) {
+                        message.error(`${status} ${statusText}`);
+                    }
                 }
             } else {
                 res.data = resData;
