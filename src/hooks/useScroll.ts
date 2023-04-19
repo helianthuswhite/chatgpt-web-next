@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import Scrollbars from "react-custom-scrollbars";
+import Scrollbars from "react-custom-scrollbars-2";
 
 const useScroll = () => {
     const scrollRef = useRef<Scrollbars>(null);
