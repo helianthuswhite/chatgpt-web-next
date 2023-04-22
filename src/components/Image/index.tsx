@@ -30,10 +30,14 @@ const MyImage: React.FC<Props> = ({ loading, urls, onRegenerate }) => {
                     ))
                 ) : (
                     <div className="flex-1 flex items-center justify-center flex-col h-60">
-                        <p className="mt-4 text-gray-500">图片加载失败(＞﹏＜)</p>
-                        <Button type="link" onClick={onRegenerate}>
-                            重试
-                        </Button>
+                        {!loading && (
+                            <>
+                                <p className="mt-4 text-gray-500">图片加载失败(＞﹏＜)</p>
+                                <Button type="link" onClick={onRegenerate}>
+                                    重试
+                                </Button>
+                            </>
+                        )}
                     </div>
                 )}
             </div>
