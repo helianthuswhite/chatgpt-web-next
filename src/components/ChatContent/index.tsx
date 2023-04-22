@@ -51,6 +51,8 @@ const ChatContent = () => {
                                         text={item.text}
                                         inversion={item.inversion}
                                         error={item.error}
+                                        isImage={item.isImage}
+                                        images={item.images}
                                         loading={item.loading}
                                         onRegenerate={() => request(index)}
                                         onDelete={() => deleteChat(uuid, index)}

@@ -1,8 +1,15 @@
 import Avatar from "@/components/Avatar";
 import Text from "@/components/Text";
-import { CopyOutlined, DeleteOutlined, MoreOutlined, ReloadOutlined } from "@ant-design/icons";
-import { Dropdown, message, Popover, Tooltip } from "antd";
+import {
+    CopyOutlined,
+    DeleteOutlined,
+    MoreOutlined,
+    PictureFilled,
+    ReloadOutlined,
+} from "@ant-design/icons";
+import { Dropdown, message } from "antd";
 import Button from "@/components/Button";
+import Image from "@/components/Image";
 import classNames from "classnames";
 import copyToClipboard from "@/utils/copyToClipboard";
 
@@ -12,6 +19,8 @@ interface Props {
     inversion?: boolean;
     error?: boolean;
     loading?: boolean;
+    isImage?: boolean;
+    images?: string[];
     onRegenerate?: () => void;
     onDelete?: () => void;
 }
@@ -22,6 +31,8 @@ const Message: React.FC<Props> = ({
     text,
     error,
     loading,
+    isImage,
+    images,
     onRegenerate,
     onDelete,
 }) => {
@@ -53,6 +64,9 @@ const Message: React.FC<Props> = ({
                         inversion ? "text-right" : "text-left"
                     )}
                 >
+                    {isImage && inversion ? (
+                        <PictureFilled style={{ color: "#34D399", marginRight: "5px" }} />
+                    ) : null}
                     {dateTime}
                 </p>
                 <div
@@ -61,7 +75,12 @@ const Message: React.FC<Props> = ({
                         inversion ? "flex-row-reverse" : "flex-row"
                     )}
                 >
-                    <Text inversion={inversion} text={text} error={error} loading={loading} />
+                    {isImage && !inversion ? (
+                        // eslint-disable-next-line jsx-a11y/alt-text
+                        <Image urls={images} loading={loading} onRegenerate={onRegenerate} />
+                    ) : (
+                        <Text inversion={inversion} text={text} error={error} loading={loading} />
+                    )}
                     <div className="flex flex-col">
                         {!inversion && (
                             <Button
@@ -84,7 +103,9 @@ const Message: React.FC<Props> = ({
                                         icon: <CopyOutlined />,
                                         onClick: async () => {
                                             await copyToClipboard(text || "");
-                                            message.success("复制成功");
+                                            message.success(
+                                                isImage ? "图片链接已复制到剪切板" : "复制成功"
+                                            );
                                         },
                                     },
                                     {

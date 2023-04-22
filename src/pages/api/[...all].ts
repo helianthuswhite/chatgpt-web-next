@@ -60,7 +60,13 @@ export default async function handler(originReq: NextApiRequest, originRes: Next
                         logger.info("api-proxy", "response to client:", transformedData);
                     } catch (err) {
                         logger.error("api-proxy", "proxy response error:", err);
-                        sendResponse({ status: "fail", message: "Invalid response", code: 500 });
+                        res.end(
+                            JSON.stringify({
+                                status: "fail",
+                                message: "Invalid response",
+                                code: 500,
+                            })
+                        );
                     }
                 });
             });
