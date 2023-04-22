@@ -10,16 +10,14 @@ const useChatProgress = (responding: boolean, setResponding: (e: boolean) => voi
     const { token } = useContext(AppStore);
     const controller = useRef<AbortController>();
     const uuid = +(router.query.id || 0);
-    const conversationList = useMemo(() => {
-        return chat.find((item) => item.uuid === uuid)?.data || [];
-    }, [chat, uuid]);
 
     const request = async (index: number, onMessageUpdate?: () => void) => {
+        const conversationList = chat.find((item) => item.uuid === uuid)?.data || [];
         const currentChat = conversationList[index] || {};
         const message = currentChat.requestOptions?.prompt ?? "";
         const options = currentChat.requestOptions?.options ?? {};
 
-        if (currentChat.text && currentChat.text !== "") {
+        if (currentChat.text) {
             updateChat(uuid, index, {
                 ...currentChat,
                 dateTime: new Date().toLocaleString(),
@@ -49,33 +47,52 @@ const useChatProgress = (responding: boolean, setResponding: (e: boolean) => voi
                     ) => {
                         const xhr = progressEvent.target;
                         const { responseText } = xhr as XMLHttpRequest;
-                        // Always process the final line
-                        const lastIndex = responseText.lastIndexOf("\n");
-                        let chunk = responseText;
-                        if (lastIndex !== -1) chunk = responseText.substring(lastIndex);
-                        try {
-                            const data = JSON.parse(chunk);
+
+                        //  if the response is image
+                        if (options.isImage) {
+                            const { data = [] } = JSON.parse(responseText);
+                            const images = data.map((item: { url: string }) => item.url);
                             updateChat(uuid, index, {
                                 dateTime: new Date().toLocaleString(),
-                                text: data.text ?? "",
+                                text: images.join(","),
+                                images,
+                                isImage: true,
                                 inversion: false,
                                 error: false,
                                 loading: false,
-                                conversationOptions: {
-                                    conversationId: data.conversationId,
-                                    parentMessageId: data.id,
-                                },
+                                conversationOptions: null,
                                 requestOptions: { prompt: message, options: { ...options } },
                             });
                             onMessageUpdate?.();
-                        } catch (error) {
-                            console.error(error);
+                        } else {
+                            // Always process the final line
+                            const lastIndex = responseText.lastIndexOf("\n");
+                            let chunk = responseText;
+                            if (lastIndex !== -1) chunk = responseText.substring(lastIndex);
+                            try {
+                                const data = JSON.parse(chunk);
+                                updateChat(uuid, index, {
+                                    dateTime: new Date().toLocaleString(),
+                                    text: data.text ?? "",
+                                    inversion: false,
+                                    error: false,
+                                    loading: false,
+                                    conversationOptions: {
+                                        conversationId: data.conversationId,
+                                        parentMessageId: data.id,
+                                    },
+                                    requestOptions: { prompt: message, options: { ...options } },
+                                });
+                                onMessageUpdate?.();
+                            } catch (error) {
+                                console.error(error);
+                            }
                         }
                     },
                 }
             );
         } catch (error: any) {
-            if (!error) {
+            if (!error && !currentChat.isImage) {
                 return;
             }
 
@@ -86,6 +103,8 @@ const useChatProgress = (responding: boolean, setResponding: (e: boolean) => voi
                 inversion: false,
                 error: true,
                 loading: false,
+                isImage: currentChat.isImage,
+                images: [],
                 conversationOptions: null,
                 requestOptions: { prompt: message, options: { ...options } },
             });

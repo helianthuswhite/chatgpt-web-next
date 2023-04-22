@@ -3,7 +3,7 @@ import Button from "@/components/Button";
 import classNames from "classnames";
 import { useContext, useMemo, useState } from "react";
 import { DeleteOutlined, DownloadOutlined, ProfileOutlined, SendOutlined } from "@ant-design/icons";
-import { Input, message, Modal } from "antd";
+import { Input, Mentions, message, Modal } from "antd";
 import { useRouter } from "next/router";
 import { ChatStore, DEFAULT_TITLE } from "@/store/Chat";
 import useChatProgress from "@/hooks/useChatProgress";
@@ -31,8 +31,14 @@ const Footer: React.FC<Props> = ({ onMessageUpdate, responding, setResponding })
         return history.find((item) => item.uuid === uuid);
     }, [history, uuid]);
 
-    const submit = async (message: string) => {
-        if (!message || message.trim() === "") return;
+    const submit = async (text: string) => {
+        let message = text.trim();
+        if (!message || message === "/image") return;
+
+        const isImage = message.startsWith("/image");
+        if (isImage) {
+            message = message.replace("/image", "").trim();
+        }
 
         if (currentHistory?.title && currentHistory.title === DEFAULT_TITLE) {
             updateHistory({ title: message, uuid });
@@ -42,6 +48,7 @@ const Footer: React.FC<Props> = ({ onMessageUpdate, responding, setResponding })
             dateTime: new Date().toLocaleString(),
             text: message,
             inversion: true,
+            isImage,
             error: false,
             conversationOptions: null,
             requestOptions: { prompt: message, options: null },
@@ -51,12 +58,13 @@ const Footer: React.FC<Props> = ({ onMessageUpdate, responding, setResponding })
 
         const responseList = conversationList.filter((item) => !item.inversion && !item.error);
         const lastContext = responseList[responseList.length - 1]?.conversationOptions;
-        const options = lastContext && hasContext ? { ...lastContext } : {};
+        const options = lastContext && hasContext ? { ...lastContext, isImage } : { isImage };
         addChat(uuid, {
             dateTime: new Date().toLocaleString(),
             text: "",
             loading: true,
             inversion: false,
+            isImage,
             error: false,
             conversationOptions: null,
             requestOptions: { prompt: message, options },
@@ -145,15 +153,21 @@ const Footer: React.FC<Props> = ({ onMessageUpdate, responding, setResponding })
                             </Button>
                         </>
                     )}
-                    <Input.TextArea
+                    <Mentions
                         value={value}
                         placeholder={
-                            isMobile ? "来说点什么吧..." : "来说点什么吧...（Shift + Enter = 换行）"
+                            isMobile
+                                ? "来说点什么吧...（使用 / 可切换图片模式）"
+                                : "来说点什么吧...（Shift + Enter = 换行，使用 / 可切换图片模式）"
                         }
+                        prefix={["/"]}
+                        placement="top"
                         autoSize={{ minRows: 1, maxRows: 2 }}
-                        onChange={(e) => setValue(e.target.value)}
+                        onChange={(value) => setValue(value)}
                         onPressEnter={onPressEnter}
-                    />
+                    >
+                        <Mentions.Option value="image">图片模式</Mentions.Option>
+                    </Mentions>
                     <Button type="primary" onClick={() => submit(value)}>
                         <SendOutlined />
                     </Button>

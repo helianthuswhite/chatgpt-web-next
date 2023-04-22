@@ -15,8 +15,17 @@ export interface ChatMessage {
     messageId: string;
 }
 
+export interface ImageMessage {
+    n?: number;
+    prompt: string;
+    responseFormat?: "url" | "b64_json";
+    size?: "256x256" | "512x512" | "1024x1024";
+    user?: string;
+}
+
 export interface ChatContext {
     parentMessageId?: string;
+    isImage?: boolean;
 }
 
 dotenv.config();
@@ -177,6 +186,50 @@ export const chatReplyProcess = async (req: NextApiRequest, res: NextApiResponse
         const code = error.code || 500;
         const msg = error.message ?? "Please check the back-end console";
         logger.error("chatgpt", msg);
+        return sendResponse({ status: "fail", message: msg, code });
+    }
+};
+
+export const chatReplyImage = async (req: NextApiRequest, res: NextApiResponse) => {
+    try {
+        const { prompt } = req.body as {
+            prompt: string;
+        };
+
+        const response = await fetch(
+            new URL("/api/v1/openai/v1/image", process.env.BACKEND_ENDPOINT),
+            {
+                method: req.method,
+                headers: getAuthHeader(req),
+                body: JSON.stringify({
+                    n: 1,
+                    prompt,
+                    responseFormat: "url",
+                    size: "512x512",
+                }),
+            }
+        );
+
+        if (!response.ok) {
+            let reason: string;
+
+            try {
+                reason = await response.text();
+            } catch (err) {
+                reason = response.statusText;
+            }
+
+            const msg = `get image error ${response.status}: ${reason}`;
+            throw { message: msg, code: response.status };
+        }
+
+        const data = await response.json();
+        logger.info("chatgpt", "get image success", data);
+        res.end(JSON.stringify(data));
+    } catch (error: any) {
+        const code = error.code || 500;
+        const msg = error.message ?? "Please check the back-end console";
+        logger.error("chatgpt", "get image error", msg);
         return sendResponse({ status: "fail", message: msg, code });
     }
 };

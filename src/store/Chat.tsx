@@ -5,6 +5,7 @@ import { createContext, useEffect, useState } from "react";
 export interface ConversationRequest {
     conversationId?: string;
     parentMessageId?: string;
+    isImage?: boolean;
 }
 
 export interface History {
@@ -18,6 +19,8 @@ export interface ChatData {
     inversion?: boolean;
     error?: boolean;
     loading?: boolean;
+    isImage?: boolean;
+    images?: string[];
     conversationOptions?: ConversationRequest | null;
     requestOptions: { prompt: string; options?: ConversationRequest | null };
 }
