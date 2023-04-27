@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import { Image, Spin } from "antd";
 import Button from "@/components/Button";
+import { useState } from "react";
 
 interface Props {
     urls?: string[];
@@ -9,7 +10,8 @@ interface Props {
 }
 
 const MyImage: React.FC<Props> = ({ loading, urls, onRegenerate }) => {
-    const totalImages = urls?.length;
+    const [totalImages, setTotalImages] = useState(urls?.length || 0);
+
     return (
         <Spin
             wrapperClassName={classNames("w-80", "rounded-md", "p-2", "bg-slate-100")}
@@ -17,15 +19,23 @@ const MyImage: React.FC<Props> = ({ loading, urls, onRegenerate }) => {
             spinning={loading}
             size="large"
         >
-            <div className="flex flex-wrap items-center">
+            <div className="flex flex-wrap items-center min-h-60">
                 {totalImages ? (
-                    urls.map((url) => (
+                    urls?.map((url) => (
                         <Image
                             width={totalImages > 1 ? "50%" : "100%"}
                             className="flex-1"
                             alt=""
                             key={url}
                             src={url}
+                            placeholder={
+                                <Spin
+                                    className="w-full h-full flex items-center justify-center"
+                                    spinning
+                                    size="large"
+                                />
+                            }
+                            onError={() => setTotalImages(0)}
                         />
                     ))
                 ) : (
