@@ -86,7 +86,7 @@ const BasicInfo: React.FC = () => {
     };
 
     const genQRCode = async (orderInfo: OrderResult) => {
-        const data = await QRCode.toDataURL("https://qr.alipay.com/bax005809ocvevvtoruh25f3");
+        const data = await QRCode.toDataURL(orderInfo.qrCode);
         setQrcode(data);
     };
 
