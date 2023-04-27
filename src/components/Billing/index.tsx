@@ -1,4 +1,4 @@
-import { Alert } from "antd";
+import { Alert, message } from "antd";
 import { useEffect, useState } from "react";
 import Button from "@/components/Button";
 import http from "@/service/http";
@@ -95,6 +95,10 @@ const BasicInfo: React.FC = () => {
         try {
             const data = await http.checkOrder(orderInfo!.orderId);
             setOrderStatus(data);
+
+            if (data === OrderStatus.payed) {
+                message.success("您已成功支付，当前积分已更新");
+            }
         } catch (error) {
             console.error(error);
         }

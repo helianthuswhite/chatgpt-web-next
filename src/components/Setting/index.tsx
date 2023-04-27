@@ -24,7 +24,7 @@ const Setting: React.FC<Props> = ({ open, notice, onCancel }) => {
             width={800}
             bodyStyle={isMobile ? {} : { padding: "54px 54px 24px 24px" }}
         >
-            <Tabs tabPosition={isMobile ? "top" : "left"}>
+            <Tabs destroyInactiveTabPane tabPosition={isMobile ? "top" : "left"}>
                 <Tabs.TabPane tab="基本信息" key="1">
                     <BasicInfo notice={notice} />
                 </Tabs.TabPane>
