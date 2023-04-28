@@ -3,6 +3,7 @@ import { Client, Options, Response } from "web-rest-client";
 import { LoginInfo, RegisterInfo } from "@/pages/login";
 import { SendResponseOptions } from "@/service/server";
 import { UserInfo } from "@/store/User";
+import { OrderParams, OrderResult, OrderStatus } from "@/components/Billing";
 
 interface ReuqestOptions extends Omit<Options, "url" | "method"> {
     silent?: boolean;
@@ -71,6 +72,14 @@ class HttpService extends Client {
 
     recharget(body: { key: string }) {
         return this.post("/api/v1/integral/recharge", body);
+    }
+
+    createOrder(body: OrderParams) {
+        return this.post("/api/v1/pay/pre_create", body) as Promise<OrderResult>;
+    }
+
+    checkOrder(orderId: number) {
+        return this.get("/api/v1/pay/status", { orderId }) as Promise<OrderStatus>;
     }
 }
 
