@@ -28,7 +28,7 @@ const Setting: React.FC<Props> = ({ open, notice, onCancel }) => {
                 <Tabs.TabPane tab="基本信息" key="1">
                     <BasicInfo notice={notice} />
                 </Tabs.TabPane>
-                <Tabs.TabPane tab="价格" key="2">
+                <Tabs.TabPane tab="购买套餐" key="2">
                     <Billing />
                 </Tabs.TabPane>
             </Tabs>

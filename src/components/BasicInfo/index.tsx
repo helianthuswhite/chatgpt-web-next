@@ -5,6 +5,7 @@ import { UserStore } from "@/store/User";
 import copyToClipboard from "@/utils/copyToClipboard";
 import http from "@/service/http";
 import { useRouter } from "next/router";
+import useIsMobile from "@/hooks/useIsMobile";
 
 interface Props {
     notice?: string;
@@ -13,9 +14,11 @@ interface Props {
 const BasicInfo: React.FC<Props> = ({ notice }) => {
     const { userInfo, refreshUserInfo } = useContext(UserStore);
     const router = useRouter();
+    const isMobile = useIsMobile();
     const [rechargeOpen, setRechargeOpen] = useState(false);
     const [rechargeCode, setChargeCode] = useState("");
     const [rechargeLoading, setRechargeLoading] = useState(false);
+    const leftSpan = isMobile ? 8 : 6;
 
     useEffect(() => {
         refreshUserInfo();
@@ -60,25 +63,25 @@ const BasicInfo: React.FC<Props> = ({ notice }) => {
                 />
             )}
             <Row align="middle" gutter={[16, 16]}>
-                <Col span={6}>
+                <Col span={leftSpan}>
                     <label>邮箱账号：</label>
                 </Col>
-                <Col span={18}>
+                <Col span={24 - leftSpan}>
                     <span>{userInfo.email}</span>
                 </Col>
-                <Col span={6}>
+                <Col span={leftSpan}>
                     <label>邀请码：</label>
                 </Col>
-                <Col span={18}>
+                <Col span={24 - leftSpan}>
                     <span>{userInfo.inviteCode}</span>
                     <Button type="link" onClick={onCopyInviteUrl}>
                         复制邀请链接
                     </Button>
                 </Col>
-                <Col span={6}>
+                <Col span={leftSpan}>
                     <label>剩余积分：</label>
                 </Col>
-                <Col span={18}>
+                <Col span={24 - leftSpan}>
                     <span>{userInfo.integral}</span>
                     <Popconfirm
                         icon={null}
