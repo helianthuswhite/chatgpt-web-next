@@ -45,4 +45,5 @@ export const StaticFileExtensions = [
     ".xlsx",
     ".xml",
     ".zip",
+    ".txt",
 ];
