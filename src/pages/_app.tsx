@@ -7,6 +7,7 @@ import type { AppProps } from "next/app";
 import AppStoreProvider from "@/store/App";
 import UserStoreProvider from "@/store/User";
 import { ConfigProvider } from "antd";
+import Script from "next/script";
 
 ConfigProvider.config({
     theme: {
@@ -19,6 +20,11 @@ export default function App({ Component, pageProps }: AppProps) {
         <AppStoreProvider>
             <UserStoreProvider>
                 <Component {...pageProps} />
+                <Script
+                    async
+                    src="https://analytics.umami.is/script.js"
+                    data-website-id="04dea4d2-4a63-4984-8918-9d030fc17e60"
+                />
             </UserStoreProvider>
         </AppStoreProvider>
     );
