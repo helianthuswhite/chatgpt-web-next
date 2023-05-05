@@ -1,117 +1,65 @@
-# ChatGPT Web NextJS
+<div style="text-align: center;"><img width="100" style="display: block; margin: 0 auto 20px;" src="https://raw.githubusercontent.com/helianthuswhite/chatgpt-web-next/c7372143ceb63310631a24ed0f8295e2487407c5/public/logo.svg" /><a style="text-align: center; font-size: 32px;" href="https://chatalpha.top/" target="_blank">ChatAlpha</a></div>
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/-4ukN3?referralCode=ZtthnC)
+## 🚨 项目介绍
 
-English | [中文文档](./README-zh_CN.md)
+[ChatAlpha](https://github.com/helianthuswhite/chatgpt-web-next) 是基于 `ChatGPT` 的在线智能对话平台，除包含基础的 AI 对话功能之外，还提供了图片生成、智能工具、角色扮演等多种不同的玩法。整个项目支持了用户注册登录及积分购买与付费功能，且所有的功能的 **_前端代码_** 均已开源，开发者可以通过该项目进行学习和二次开发。
 
-## Introduction
+项目在线体验地址为：https://chatalpha.top/
 
-> This project comes from the origin project [chatgpt-web](https://github.com/Chanzhaoyu/chatgpt-web) which is an excellent chatgpt website.
+> 如果您只有简单的私有化部署 `ChatGPT` 的需求，您可以切换到该项目的 `no-sql` 分支，该分支支持使用 `Railway.app` 进行一键部署，且不需要依赖任何服务端！
 
-[chatgpt-web-next](https://github.com/helianthuswhite/chatgpt-web-next) uses the `NextJS` and `TailwindCSS` to develop, and uses the `railway.app` to deploy for free.
+## 📌 功能列表
 
-You can experience it through this website [chat.helianthuswhite.cn](https://chat.helianthuswhite.cn/). Of course, I won't store anything because all your conversations are store in your localstorage. when you clear your browser's cache, it's cleared too.
+-   [x] 文本对话
+-   [x] 图片对话
+-   [x] 注册/登录
+-   [x] 移动端适配
+-   [x] 积分与付费功能
+-   [ ] 夜间模式
+-   [ ] 智能工具
+-   [ ] 个人信息修改
+-   [ ] 垂类数据问答
+-   [ ] 自定义对话参数
+-   [ ] 数据埋点
+-   [ ] 更多功能，敬请期待...
 
-## Development
+## 🛠️ 本地开发
 
-This is a standard `nextjs` project, then you can use the `install` command to install dependencies:
+该项目为标准的 `NextJS` 项目，且使用 `Antd` 做为组件库，使用 `TailwindCSS` 进行样式处理，将本项目 `clone` 到本地之后通过以下命令安装项目依赖:
 
-    npm install --legacy-peer-deps
+    npm install
 
-or use `cnpm`:
+项目依赖安装完成之后，需要在项目的根目录创建一个环境变量文件 `.env.local`，该文件已在 `.gitignore` 中添加，因此不会上传到项目仓库。
 
-    cnpm install
-
-After install, you need to config the environment variables.
-
-Just create a file named `.env.local` which has been ignored by the `.gitignore` file.
-
-Here are the variables you can set in the `.env.local` file.
+环境变量的配置如下所示：
 
 ```yml
-# OpenAI API Key - https://platform.openai.com/overview
-OPENAI_API_KEY=
+# 服务端的endpoint地址，必填，由于该项目只有前端部分，因此需要自己实现一些后端接口并进行转发
+BACKEND_ENDPOINT=
 
-# change this to an `accessToken` extracted from the ChatGPT site's `https://chat.openai.com/api/auth/session` response
-OPENAI_ACCESS_TOKEN=
-
-# OpenAI API Base URL - https://api.openai.com
-OPENAI_API_BASE_URL=
-
-# OpenAI API Model - https://platform.openai.com/docs/models
-OPENAI_API_MODEL=
-
-# Reverse Proxy
-API_REVERSE_PROXY=
-
-# timeout
-TIMEOUT_MS=100000
-
-# Socks Proxy Host
-SOCKS_PROXY_HOST=
-
-# Socks Proxy Port
-SOCKS_PROXY_PORT=
-
-# Simple Authorization Tokens - 'xxxxx,xxxxx'
-LOCAL_ACCESS_TOKENS=
+# 项目的通知信息，可选，用于展示项目公告信息，支持html文本
+NOTICE=
 ```
 
-If you set the correct variables, you can start the project by the `dev` command:
+环境变量设置完成之后，我们可以通过 `dev` 命令来启动项目，如下所示:
 
     npm run dev
 
-## Build and Deploy
+## ⚙️ 编译和部署
 
-### Node Service
-
-As a normal node service, you can use the following command to build on your deploy server.
+我们可以在开发机或者服务器上使用基础的 `build` 命令来编译项目，如下：
 
     npm run build
 
-The `nextjs` will execute the build process and generate all files in the `.next` folder. After build, use the `start` command to start the server.
+当一个 `NextJS` 项目编译完成之后，在项目的根目录会生成一个 `.next` 文件夹，在该文件夹中即是编译完成后的产物，之后我们只需要使用 `start` 命令即可轻松启动项目：
 
     npm run start
 
-You can also use a daemon process like `pm2` like this.
+我们也可以使用 `pm2` 等进程管理工具来启动项目，启动命令如下：
 
     pm2 start npm -- run start
 
-### Docker Image
-
-Here also provides a way to deploy by using a docker image. Just run the following command in the project dir (If you have installed docker and start the service).
-
-    docker build -t chatgpt-web-next .
-
-You can see the [Dockerfile](./Dockerfile) for more information about the process.
-
-When the image produce successful, just run it as the common docker service.
-
-    docker run --name chatgpt -d -p 3000:3000 --env OPENAI_API_KEY=sk-xxxx --env SOCKS_PROXY_HOST=127.0.0.1 --env SOCKS_PROXY_PORT=7890
-
-> Note that the docker variables should be set correctly.
-
-### Cloud Services
-
-Uising a cloud service to deploy is recommended. [railway.app](https://railway.app/)、[vercel](https://vercel.com/)、[zeabur](https://zeabur.com/) etc are good choices.
-
-You may choose what you like and see the official docs for deploying.
-
-## Environment Variables
-
-| Environment Variable  | Required                                    | Description                                                                                                      |
-| --------------------- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `TIMEOUT_MS`          | Optional                                    | Timeout in milliseconds                                                                                          |
-| `OPENAI_API_KEY`      | Optional                                    | Required for `OpenAI API`. `apiKey` can be obtained from [here](https://platform.openai.com/overview).           |
-| `OPENAI_ACCESS_TOKEN` | Optional                                    | Required for `Web API`. `accessToken` can be obtained from [here](https://chat.openai.com/api/auth/session).     |
-| `OPENAI_API_BASE_URL` | Optional, only for `OpenAI API`             | API endpoint.                                                                                                    |
-| `OPENAI_API_MODEL`    | Optional, only for `OpenAI API`             | API model.                                                                                                       |
-| `API_REVERSE_PROXY`   | Optional, only for `Web API`                | Reverse proxy address for `Web API`. [Details](https://github.com/transitive-bullshit/chatgpt-api#reverse-proxy) |
-| `SOCKS_PROXY_HOST`    | Optional, effective with `SOCKS_PROXY_PORT` | Socks proxy.                                                                                                     |
-| `SOCKS_PROXY_PORT`    | Optional, effective with `SOCKS_PROXY_HOST` | Socks proxy port.                                                                                                |
-| `LOCAL_ACCESS_TOKENS` | Optional                                    | Simple authorization tokens, empty means no auth control.                                                        |
-
-> Note: Changing environment variables in Railway will cause re-deployment.
+_对于个人开发者来讲，这里推荐使用 [railway.app](https://railway.app/)、[vercel](https://vercel.com/)、[zeabur](https://zeabur.com/) 等 Serverless 服务进行部署，具体的部署方式可以查看对应服务的文档。_
 
 ## License
 
