@@ -1,4 +1,4 @@
-<div style="text-align: center;"><img width="100" style="display: block; margin: 0 auto 20px;" src="https://raw.githubusercontent.com/helianthuswhite/chatgpt-web-next/c7372143ceb63310631a24ed0f8295e2487407c5/public/logo.svg" /><a style="text-align: center; font-size: 32px;" href="https://chatalpha.top/" target="_blank">ChatAlpha</a></div>
+<div align="center"><img width="100" style="display: block; margin: 0 auto;" src="https://raw.githubusercontent.com/helianthuswhite/chatgpt-web-next/c7372143ceb63310631a24ed0f8295e2487407c5/public/logo.svg" /><h1><a style="text-align: center;" href="https://chatalpha.top/" target="_blank">ChatAlpha</a></h1></div>
 
 ## 🚨 项目介绍
 
