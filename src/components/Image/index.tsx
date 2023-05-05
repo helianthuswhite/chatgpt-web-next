@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import { Image, Spin } from "antd";
 import Button from "@/components/Button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Props {
     urls?: string[];
@@ -10,7 +10,13 @@ interface Props {
 }
 
 const MyImage: React.FC<Props> = ({ loading, urls, onRegenerate }) => {
-    const [totalImages, setTotalImages] = useState(urls?.length || 0);
+    const [totalImages, setTotalImages] = useState(0);
+
+    useEffect(() => {
+        if (urls) {
+            setTotalImages(urls.length);
+        }
+    }, [urls]);
 
     return (
         <Spin
