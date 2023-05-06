@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 import logger from "@/service/logger";
 import { getAuthHeader, sendResponse } from "@/service/server";
 import { NextApiRequest, NextApiResponse } from "next";
+import { ConversationRequest } from "@/store/Chat";
 
 export interface ChatMessage {
     role: string;
@@ -192,16 +193,19 @@ export const chatReplyProcess = async (req: NextApiRequest, res: NextApiResponse
 
 export const chatReplyImage = async (req: NextApiRequest, res: NextApiResponse) => {
     try {
-        const { prompt } = req.body as {
+        const { prompt, options = {} } = req.body as {
             prompt: string;
+            options?: ConversationRequest;
         };
 
+        const model = options.model?.split("$")[1] || null;
         const response = await fetch(
             new URL("/api/v1/openai/v1/image", process.env.BACKEND_ENDPOINT),
             {
                 method: req.method,
                 headers: getAuthHeader(req),
                 body: JSON.stringify({
+                    model,
                     n: 1,
                     prompt,
                     responseFormat: "url",

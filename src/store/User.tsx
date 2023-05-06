@@ -9,6 +9,7 @@ export interface UserInfo {
     integral: number;
     inviteCode: string;
     nickName?: string;
+    vipUser?: boolean;
 }
 
 export interface userStoreInterface {

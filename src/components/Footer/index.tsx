@@ -3,12 +3,13 @@ import Button from "@/components/Button";
 import classNames from "classnames";
 import { useContext, useMemo, useState } from "react";
 import { DeleteOutlined, DownloadOutlined, ProfileOutlined, SendOutlined } from "@ant-design/icons";
-import { Input, Mentions, message, Modal } from "antd";
+import { Mentions, message, Modal } from "antd";
 import { useRouter } from "next/router";
-import { ChatStore, DEFAULT_TITLE } from "@/store/Chat";
+import { ChatStore, DEFAULT_TITLE, Model } from "@/store/Chat";
 import useChatProgress from "@/hooks/useChatProgress";
 import downloadAsImage from "@/utils/downloadAsImage";
 import { AppStore } from "@/store/App";
+import { UserStore } from "@/store/User";
 
 interface Props {
     responding: boolean;
@@ -19,8 +20,10 @@ interface Props {
 const Footer: React.FC<Props> = ({ onMessageUpdate, responding, setResponding }) => {
     const isMobile = useIsMobile();
     const router = useRouter();
-    const { chat, history, addChat, clearChat, updateHistory } = useContext(ChatStore);
+    const { chat, model, history, addChat, setModel, clearChat, updateHistory } =
+        useContext(ChatStore);
     const { hasContext, setData } = useContext(AppStore);
+    const { userInfo } = useContext(UserStore);
     const [value, setValue] = useState("");
     const { request } = useChatProgress(responding, setResponding);
     const uuid = +(router.query.id || 0);
@@ -58,7 +61,8 @@ const Footer: React.FC<Props> = ({ onMessageUpdate, responding, setResponding })
 
         const responseList = conversationList.filter((item) => !item.inversion && !item.error);
         const lastContext = responseList[responseList.length - 1]?.conversationOptions;
-        const options = lastContext && hasContext ? { ...lastContext, isImage } : { isImage };
+        const options =
+            lastContext && hasContext ? { ...lastContext, isImage, model } : { isImage, model };
         addChat(uuid, {
             dateTime: new Date().toLocaleString(),
             text: "",
@@ -112,6 +116,11 @@ const Footer: React.FC<Props> = ({ onMessageUpdate, responding, setResponding })
         }
     };
 
+    const onInputChange = (value: string) => {
+        const regx = new RegExp("/image\\$\\s*([^\\s]+)");
+        setValue(value.replace(regx, "/image"));
+    };
+
     return (
         <footer
             className={classNames(
@@ -163,10 +172,16 @@ const Footer: React.FC<Props> = ({ onMessageUpdate, responding, setResponding })
                         prefix={["/"]}
                         placement="top"
                         autoSize={{ minRows: 1, maxRows: 2 }}
-                        onChange={(value) => setValue(value)}
+                        onChange={onInputChange}
+                        onSelect={(e) => setModel(e.value as Model)}
                         onPressEnter={onPressEnter}
                     >
-                        <Mentions.Option value="image">图片模式</Mentions.Option>
+                        <Mentions.Option value="image$dall-e2">图片模式-Dalle2</Mentions.Option>
+                        {userInfo.vipUser && (
+                            <Mentions.Option value="image$stable-diffusion">
+                                图片模式-Stable Diffusion
+                            </Mentions.Option>
+                        )}
                     </Mentions>
                     <Button type="primary" onClick={() => submit(value)}>
                         <SendOutlined />

@@ -31,6 +31,7 @@ const ChatPage: React.FC<Props> = ({ userInfo, notice }) => {
             email: userInfo?.email || originUserInfo.email,
             inviteCode: userInfo?.inviteCode || "",
             integral: userInfo?.integral || 0,
+            vipUser: userInfo?.vipUser || false,
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userInfo]);
