@@ -163,12 +163,7 @@ const BasicInfo: React.FC = () => {
             <Alert
                 className="bg-transparent"
                 banner
-                message={
-                    <div>
-                        当前对话普通文本单次消耗1积分，图片模式单次消耗3积分；
-                        <b>自5月1日起，图片模式单次消耗将变为8积分。</b>
-                    </div>
-                }
+                message={<div>当前对话普通文本单次消耗1积分，图片模式单次消耗8积分</div>}
             />
 
             <div className={classNames("mt-4 mb-8", isMobile && "h-[20rem]")}>

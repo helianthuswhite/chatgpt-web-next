@@ -1,17 +1,20 @@
 import storage from "@/service/localStorage";
 import { useRouter } from "next/router";
-import { createContext, useEffect, useState } from "react";
+import { createContext, Dispatch, SetStateAction, useEffect, useState } from "react";
 
 export interface ConversationRequest {
     conversationId?: string;
     parentMessageId?: string;
     isImage?: boolean;
+    model?: Model;
 }
 
 export interface History {
     title: string;
     uuid: number;
 }
+
+export type Model = "chat$gpt-3.5-turbo" | "image$dall-e2" | "image$stable-diffusion";
 
 export interface ChatData {
     dateTime: string;
@@ -29,6 +32,8 @@ export interface Chat {
     active: number | null;
     history: History[];
     chat: { uuid: number; data: ChatData[] }[];
+    model: Model;
+    setModel: Dispatch<SetStateAction<Model>>;
     addHistory: (history: History) => void;
     deleteHistory: (uuid: number) => void;
     updateHistory: (history: History) => void;
@@ -62,6 +67,7 @@ const Chat: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [active, setActive] = useState(defaultValue.active);
     const [history, setHistory] = useState(defaultValue.history);
     const [chat, setChat] = useState(defaultValue.chat);
+    const [model, setModel] = useState<Model>("chat$gpt-3.5-turbo");
 
     const addHistory = (h: History) => {
         history.push(h);
@@ -149,6 +155,8 @@ const Chat: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 active,
                 history,
                 chat,
+                model,
+                setModel,
                 addHistory,
                 deleteHistory,
                 updateHistory,
