@@ -22,8 +22,8 @@ export default function App({ Component, pageProps }: AppProps) {
                 <Component {...pageProps} />
                 <Script
                     async
-                    src="https://analytics.umami.is/script.js"
-                    data-website-id="04dea4d2-4a63-4984-8918-9d030fc17e60"
+                    src="https://chatalpha-umami.zeabur.app/script.js"
+                    data-website-id="ecbe897f-e1ef-4e3e-8179-cc3bb9a5944c"
                 />
             </UserStoreProvider>
         </AppStoreProvider>
