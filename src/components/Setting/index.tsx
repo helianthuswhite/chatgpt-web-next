@@ -22,7 +22,7 @@ const Setting: React.FC<Props> = ({ open, notice, onCancel }) => {
             okText="保存"
             footer={null}
             width={800}
-            bodyStyle={isMobile ? {} : { padding: "54px 54px 24px 24px" }}
+            bodyStyle={isMobile ? {} : { padding: "10px 20px 0 0" }}
         >
             <Tabs destroyInactiveTabPane tabPosition={isMobile ? "top" : "left"}>
                 <Tabs.TabPane tab="基本信息" key="1">

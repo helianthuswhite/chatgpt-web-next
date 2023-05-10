@@ -13,6 +13,10 @@ declare global {
             BACKEND_ENDPOINT: string;
         }
     }
+
+    interface Window {
+        umami: any;
+    }
 }
 
 export {};

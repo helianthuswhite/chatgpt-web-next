@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import "antd/dist/antd.variable.min.css";
+@import "antd/dist/reset.css";
 
 html,
 body,
