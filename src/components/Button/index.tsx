@@ -24,7 +24,7 @@ export default dynamic(
                                 email: userInfo.email,
                                 nickName: userInfo.nickName,
                             });
-                            onClick?.(e);
+                            onClick?.(e as any);
                         }}
                     />
                 );
