@@ -8,6 +8,7 @@ import AppStoreProvider from "@/store/App";
 import UserStoreProvider from "@/store/User";
 import { ConfigProvider } from "antd";
 import Script from "next/script";
+import Nav from "@/components/Nav";
 
 export default function App({ Component, pageProps }: AppProps) {
     return (
@@ -23,6 +24,7 @@ export default function App({ Component, pageProps }: AppProps) {
         >
             <AppStoreProvider>
                 <UserStoreProvider>
+                    <Nav />
                     <Component {...pageProps} />
                     <Script
                         async
