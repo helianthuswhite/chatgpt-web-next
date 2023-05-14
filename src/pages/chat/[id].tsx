@@ -44,27 +44,15 @@ const ChatPage: React.FC<Props> = ({ userInfo, notice }) => {
                 setShowNotice(true);
             }
         }
-    }, [notice, noNotice]);
+    }, [notice, noNotice, setNotice]);
 
     return (
         <ChatStoreProvider>
-            <div
-                className={classNames(
-                    "h-full",
-                    "dark:bg-[#24272e]",
-                    "transition-all",
-                    isMobile ? "p-0" : "p-4"
-                )}
-            >
+            <div className={classNames("flex-1", "dark:bg-[#24272e]", "transition-all")}>
                 <div
                     className={classNames(
-                        "h-full",
-                        "border-gray-200",
-                        "border-solid",
-                        "overflow-hidden",
-                        isMobile
-                            ? ["rounded-none", "shadow-none", "border-none"]
-                            : ["border", "rounded-md", "shadow-md", "dark:border-neutral-800"]
+                        "h-full overflow-hidden dark:border-neutral-800",
+                        isMobile && ["rounded-none", "shadow-none", "border-none"]
                     )}
                 >
                     <Layout className={classNames("z-40", "h-full", "transition")} hasSider>

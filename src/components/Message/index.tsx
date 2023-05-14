@@ -60,7 +60,7 @@ const Message: React.FC<Props> = ({
             >
                 <p
                     className={classNames(
-                        `mb-1 text-xs text-[#b4bbc4]`,
+                        `mb-1 text-xs text-gray-400`,
                         inversion ? "text-right" : "text-left"
                     )}
                 >

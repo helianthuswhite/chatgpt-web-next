@@ -1,7 +1,6 @@
-import { AppStore } from "@/store/App";
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import Button from "@/components/Button";
-import { GlobalOutlined } from "@ant-design/icons";
+import { GlobalOutlined, MessageOutlined } from "@ant-design/icons";
 import classNames from "classnames";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -10,11 +9,6 @@ import { UserStore } from "@/store/User";
 import { MenuItemType } from "antd/es/menu/hooks/useItems";
 import Icon from "@/components/Icon";
 import Link from "next/link";
-
-interface Props {
-    title?: string;
-    scrollToTop?: () => void;
-}
 
 const avatarMenuItems: MenuItemType[] = [
     {
@@ -34,11 +28,9 @@ const languageMenuItems: MenuItemType[] = [
     },
 ];
 
-const Header: React.FC<Props> = ({ title, scrollToTop }) => {
-    const clickCount = useRef(0);
+const Header: React.FC = () => {
     const pathname = usePathname();
     const { userInfo } = useContext(UserStore);
-    const { sidebarCollapsed, hasContext, setData, setSidebarCollapsed } = useContext(AppStore);
     const [navMenuKey, setNavMenuKey] = useState<string>("explore");
     const navMenuItems = useMemo(
         () => [
@@ -50,7 +42,7 @@ const Header: React.FC<Props> = ({ title, scrollToTop }) => {
             {
                 label: "对话",
                 key: "chat",
-                icon: <Icon type="icon-chat" />,
+                icon: <MessageOutlined style={{ transform: "rotateY(180deg)" }} />,
             },
             {
                 label: "广场",
@@ -103,7 +95,7 @@ const Header: React.FC<Props> = ({ title, scrollToTop }) => {
     return (
         <header
             className={classNames(
-                "border-0 border-b border-solid border-gray-100 dark:border-neutral-800 bg-white/80 ",
+                "border-0 border-b border-solid border-gray-200 dark:border-neutral-800 bg-white/80 ",
                 "dark:bg-black/20 flex items-center justify-between h-16"
             )}
         >

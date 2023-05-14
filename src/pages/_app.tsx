@@ -24,8 +24,10 @@ export default function App({ Component, pageProps }: AppProps) {
         >
             <AppStoreProvider>
                 <UserStoreProvider>
-                    <Nav />
-                    <Component {...pageProps} />
+                    <div className="flex-col h-full flex">
+                        <Nav />
+                        <Component {...pageProps} />
+                    </div>
                     <Script
                         async
                         src="https://chatalpha-umami.zeabur.app/script.js"
