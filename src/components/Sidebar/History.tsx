@@ -1,14 +1,7 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import classNames from "classnames";
-import { Input, Popconfirm } from "antd";
-import {
-    CloseOutlined,
-    DeleteOutlined,
-    EditOutlined,
-    MessageOutlined,
-    SaveOutlined,
-} from "@ant-design/icons";
-import Button from "@/components/Button";
+import { Popconfirm } from "antd";
+import { CloseOutlined } from "@ant-design/icons";
 import { ChatStore } from "@/store/Chat";
 import { useRouter } from "next/router";
 import Avatar from "@/components/Avatar";
@@ -19,15 +12,8 @@ interface Props {
 }
 
 const History: React.FC<Props> = ({ uuid, title }) => {
-    const { active, history, deleteHistory, updateHistory } = useContext(ChatStore);
-    const [isEdit, setIsEdit] = useState(false);
-    const [value, setValue] = useState(title);
+    const { active, history, deleteHistory } = useContext(ChatStore);
     const router = useRouter();
-
-    const onEditOk = () => {
-        updateHistory({ uuid, title: value });
-        setIsEdit(false);
-    };
 
     const onHistoryClick = () => {
         router.push(`/chat/${uuid}`);
@@ -43,26 +29,14 @@ const History: React.FC<Props> = ({ uuid, title }) => {
     return (
         <div
             className={classNames(
-                "flex items-center rounded-md cursor-pointer p-2 mb-2 hover:bg-gray-100",
+                "flex items-center rounded-md cursor-pointer p-2 mb-2 hover:bg-[#0000000f]",
                 "dark:border-neutral-800 dark:hover:bg-[#24272e] group",
-                active === uuid && ["bg-gray-100"]
+                active === uuid && ["bg-[#0000000f]"]
             )}
             onClick={onHistoryClick}
         >
             <Avatar />
             <div className="flex-1 ml-2 overflow-hidden text-ellipsis whitespace-nowrap text-left">
-                {/* {isEdit ? (
-                    <Input
-                        value={value}
-                        className="text-xs h-full p-1"
-                        size="small"
-                        autoFocus
-                        onChange={(e) => setValue(e.target.value)}
-                        onPressEnter={onEditOk}
-                    />
-                ) : (
-                    <span>{title}</span>
-                )} */}
                 <div className="flex justify-between">
                     <div className="overflow-ellipsis overflow-hidden">{title}</div>
                     <span className="text-xs leading-[1.75] text-gray-400 ml-2 group-hover:hidden">
@@ -93,27 +67,6 @@ const History: React.FC<Props> = ({ uuid, title }) => {
                     className="items-center hidden text-gray-500 p-2 -mr-1 hover:text-[#3050fb] group-hover:flex"
                 />
             </Popconfirm>
-            {/* <div className="z-10 flex right-2">
-                {isEdit ? (
-                    <span
-                        className="ant-btn ant-btn-text flex items-center p-0 h-4"
-                        style={{ color: "#3050fb" }}
-                        onClick={onEditOk}
-                    >
-                        <SaveOutlined />
-                    </span>
-                ) : (
-                    <>
-                        <span
-                            className="ant-btn ant-btn-text flex items-center p-0 h-4 mr-1"
-                            style={{ color: "#3050fb" }}
-                            onClick={() => setIsEdit(true)}
-                        >
-                            <EditOutlined />
-                        </span>
-                    </>
-                )}
-            </div> */}
         </div>
     );
 };

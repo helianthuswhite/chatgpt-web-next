@@ -2,8 +2,14 @@ import useIsMobile from "@/hooks/useIsMobile";
 import Button from "@/components/Button";
 import classNames from "classnames";
 import { useContext, useMemo, useState } from "react";
-import { DeleteOutlined, DownloadOutlined, ProfileOutlined, SendOutlined } from "@ant-design/icons";
-import { Mentions, message, Modal } from "antd";
+import {
+    ClearOutlined,
+    DeleteOutlined,
+    DownloadOutlined,
+    ProfileOutlined,
+    SendOutlined,
+} from "@ant-design/icons";
+import { Mentions, message, Modal, Tooltip } from "antd";
 import { useRouter } from "next/router";
 import { ChatStore, DEFAULT_TITLE, Model } from "@/store/Chat";
 import useChatProgress from "@/hooks/useChatProgress";
@@ -148,35 +154,41 @@ const Footer: React.FC<Props> = ({ onMessageUpdate, responding, setResponding })
         >
             <div className="w-full m-auto">
                 <div className="flex items-center justify-between space-x-2">
-                    <Button
-                        type="text"
-                        shape="circle"
-                        className="flex items-center justify-center text-lg"
-                        onClick={onClear}
-                    >
-                        <DeleteOutlined />
-                    </Button>
+                    <Tooltip title="清空对话">
+                        <Button
+                            type="text"
+                            shape="circle"
+                            className="flex items-center justify-center text-lg"
+                            onClick={onClear}
+                        >
+                            <ClearOutlined />
+                        </Button>
+                    </Tooltip>
                     {!isMobile && (
                         <>
-                            <Button
-                                type="text"
-                                shape="circle"
-                                className="flex items-center justify-center text-lg"
-                                onClick={onDownload}
-                            >
-                                <DownloadOutlined />
-                            </Button>
-                            <Button
-                                type="text"
-                                shape="circle"
-                                className={classNames(
-                                    "flex items-center justify-center text-lg hover:text-[#3050fb]",
-                                    hasContext && "text-[#3050fb] focus:text-[#3050fb]"
-                                )}
-                                onClick={onChangeContext}
-                            >
-                                <ProfileOutlined />
-                            </Button>
+                            <Tooltip title="下载为图片">
+                                <Button
+                                    type="text"
+                                    shape="circle"
+                                    className="flex items-center justify-center text-lg"
+                                    onClick={onDownload}
+                                >
+                                    <DownloadOutlined />
+                                </Button>
+                            </Tooltip>
+                            <Tooltip title={hasContext ? "关闭上下文" : "开启上下文"}>
+                                <Button
+                                    type="text"
+                                    shape="circle"
+                                    className={classNames(
+                                        "flex items-center justify-center text-lg hover:text-[#3050fb]",
+                                        hasContext && "text-[#3050fb] focus:text-[#3050fb]"
+                                    )}
+                                    onClick={onChangeContext}
+                                >
+                                    <ProfileOutlined />
+                                </Button>
+                            </Tooltip>
                         </>
                     )}
                     <Mentions

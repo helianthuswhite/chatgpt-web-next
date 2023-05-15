@@ -11,6 +11,7 @@ import { fetchServer } from "@/service/server";
 import { USER_TOKEN } from "@/constants";
 import { AppStore } from "@/store/App";
 import Button from "@/components/Button";
+import ChatSetting from "@/components/ChatSetting";
 
 interface Props {
     userInfo?: UserInfo;
@@ -60,6 +61,7 @@ const ChatPage: React.FC<Props> = ({ userInfo, notice }) => {
                         <Layout.Content className="h-full bg-white">
                             <ChatContent />
                         </Layout.Content>
+                        <ChatSetting />
                     </Layout>
                 </div>
             </div>

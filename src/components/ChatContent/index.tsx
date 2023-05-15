@@ -1,16 +1,16 @@
 import classNames from "classnames";
 import { PauseCircleFilled } from "@ant-design/icons";
-import Header from "@/components/Header";
 import useIsMobile from "@/hooks/useIsMobile";
 import useScroll from "@/hooks/useScroll";
 import Message from "@/components/Message";
 import Button from "@/components/Button";
-import Footer from "@/components/Footer";
 import { useRouter } from "next/router";
 import { ChatStore } from "@/store/Chat";
 import { useContext, useMemo, useState } from "react";
 import Scrollbar from "@/components/Scrollbar";
 import useChatProgress from "@/hooks/useChatProgress";
+import Header from "./Header";
+import Footer from "./Footer";
 
 const ChatContent = () => {
     const isMobile = useIsMobile();
@@ -29,7 +29,7 @@ const ChatContent = () => {
 
     return (
         <div className="flex flex-col w-full h-full">
-            {isMobile && <Header title={currentChatHistory?.title} scrollToTop={scrollToTop} />}
+            <Header history={currentChatHistory} />
             <main className="flex-1 overflow-hidden">
                 <Scrollbar ref={scrollRef}>
                     <div
