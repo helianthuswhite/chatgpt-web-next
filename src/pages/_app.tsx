@@ -20,6 +20,8 @@ export default function App({ Component, pageProps }: AppProps) {
                     colorLink: "#3050fb",
                     colorInfo: "#3050fb",
                     colorInfoHover: "#5978ff",
+                    colorPrimaryBorder: "#3050fb",
+                    colorPrimaryBorderHover: "#5978ff",
                 },
             }}
         >

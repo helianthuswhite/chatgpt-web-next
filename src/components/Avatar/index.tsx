@@ -18,7 +18,7 @@ const Avatar: React.FC<Props> = ({ isUser, ...props }) => {
     }
 
     return (
-        <span className="text-[28px] text-gray-700 leading-4 dark:text-white">
+        <span className="text-[28px] inline-flex items-center text-gray-700 dark:text-white">
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 32 32"
