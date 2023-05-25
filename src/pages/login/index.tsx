@@ -85,7 +85,13 @@ const Login = () => {
                 )}
             >
                 {/* <h2 className="text-center text-3xl font-extrabold text-gray-900">登录</h2> */}
-                <Image className="m-auto block" width={64} height={64} src="/logo.svg" alt="logo" />
+                <Image
+                    className="m-auto block bg-[#3050fb] p-3 rounded-xl"
+                    width={64}
+                    height={64}
+                    src="/logo.svg"
+                    alt="logo"
+                />
                 <Form form={form} className="mt-6" name="basic" onFinish={onFinish}>
                     <Form.Item
                         name="email"

@@ -45,6 +45,7 @@
     "winston": "^3.8.2"
   },
   "devDependencies": {
+    "@svgr/webpack": "^8.0.1",
     "@types/dom-to-image": "^2.6.4",
     "@types/lodash": "^4.14.191",
     "@types/markdown-it": "^12.2.3",
