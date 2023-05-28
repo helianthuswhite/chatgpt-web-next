@@ -39,17 +39,14 @@ const Footer: React.FC<Props> = ({ onMessageUpdate, responding, setResponding })
                 label: "图片模式-Dalle2",
                 value: "image$dall-e2",
             },
-        ];
-
-        if (userInfo.vipUser) {
-            options.push({
+            {
                 label: "图片模式-Stable Diffusion",
                 value: "image$stable-diffusion",
-            });
-        }
+            },
+        ];
 
         return options;
-    }, [userInfo.vipUser]);
+    }, []);
 
     const submit = async (text: string) => {
         let message = text.trim();
