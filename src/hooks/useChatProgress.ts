@@ -52,14 +52,18 @@ const useChatProgress = (responding: boolean, setResponding: (e: boolean) => voi
                         if (options.isImage) {
                             const { data = [] } = JSON.parse(responseText);
                             const images = data.map((item: { url: string }) => item.url);
+                            const taskIds = data.map((item: { taskId: string }) => item.taskId);
                             updateChat(uuid, index, {
                                 dateTime: new Date().toLocaleString(),
                                 text: images.join(","),
                                 images,
+                                //  temp to handle the one mj image
+                                taskId: taskIds[0],
                                 isImage: true,
                                 inversion: false,
                                 error: false,
                                 loading: false,
+                                model: currentChat.model,
                                 conversationOptions: null,
                                 requestOptions: { prompt: message, options: { ...options } },
                             });
@@ -104,6 +108,7 @@ const useChatProgress = (responding: boolean, setResponding: (e: boolean) => voi
                 error: true,
                 loading: false,
                 isImage: currentChat.isImage,
+                model: currentChat.model,
                 images: [],
                 conversationOptions: null,
                 requestOptions: { prompt: message, options: { ...options } },

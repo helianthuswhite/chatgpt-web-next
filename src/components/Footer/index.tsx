@@ -36,6 +36,10 @@ const Footer: React.FC<Props> = ({ onMessageUpdate, responding, setResponding })
     const mentionOptions = useMemo(() => {
         const options = [
             {
+                label: "图片模式-Midjourney",
+                value: "image$midjourney",
+            },
+            {
                 label: "图片模式-Dalle2",
                 value: "image$dall-e2",
             },
@@ -83,6 +87,7 @@ const Footer: React.FC<Props> = ({ onMessageUpdate, responding, setResponding })
             loading: true,
             inversion: false,
             isImage,
+            model,
             error: false,
             conversationOptions: null,
             requestOptions: { prompt: message, options },

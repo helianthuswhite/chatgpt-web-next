@@ -7,6 +7,9 @@ export interface ConversationRequest {
     parentMessageId?: string;
     isImage?: boolean;
     model?: Model;
+    taskId?: string;
+    operate?: string;
+    operateIndex?: number;
 }
 
 export interface History {
@@ -14,7 +17,11 @@ export interface History {
     uuid: number;
 }
 
-export type Model = "chat$gpt-3.5-turbo" | "image$dall-e2" | "image$stable-diffusion";
+export type Model =
+    | "chat$gpt-3.5-turbo"
+    | "image$dall-e2"
+    | "image$stable-diffusion"
+    | "image$midjourney";
 
 export interface ChatData {
     dateTime: string;
@@ -24,6 +31,8 @@ export interface ChatData {
     loading?: boolean;
     isImage?: boolean;
     images?: string[];
+    taskId?: string;
+    model?: Model;
     conversationOptions?: ConversationRequest | null;
     requestOptions: { prompt: string; options?: ConversationRequest | null };
 }
