@@ -199,20 +199,30 @@ export const chatReplyImage = async (req: NextApiRequest, res: NextApiResponse) 
         };
 
         const model = options.model?.split("$")[1] || null;
-        const response = await fetch(
-            new URL("/api/v1/openai/v1/image", process.env.BACKEND_ENDPOINT),
-            {
-                method: req.method,
-                headers: getAuthHeader(req),
-                body: JSON.stringify({
-                    model,
-                    n: 1,
-                    prompt,
-                    responseFormat: "url",
-                    size: "512x512",
-                }),
-            }
-        );
+        const response = options.operate
+            ? await fetch(
+                  new URL("/api/v1/openai/v1/image/operate", process.env.BACKEND_ENDPOINT),
+                  {
+                      method: req.method,
+                      headers: getAuthHeader(req),
+                      body: JSON.stringify({
+                          action: options.operate,
+                          taskId: options.taskId,
+                          index: options.operateIndex,
+                      }),
+                  }
+              )
+            : await fetch(new URL("/api/v1/openai/v1/image", process.env.BACKEND_ENDPOINT), {
+                  method: req.method,
+                  headers: getAuthHeader(req),
+                  body: JSON.stringify({
+                      model,
+                      n: 1,
+                      prompt,
+                      responseFormat: "url",
+                      size: "512x512",
+                  }),
+              });
 
         if (!response.ok) {
             let reason: string;

@@ -1,8 +1,10 @@
 import Avatar from "@/components/Avatar";
 import Text from "@/components/Text";
 import {
+    BlockOutlined,
     CopyOutlined,
     DeleteOutlined,
+    FullscreenOutlined,
     MoreOutlined,
     PictureFilled,
     ReloadOutlined,
@@ -12,17 +14,13 @@ import Button from "@/components/Button";
 import Image from "@/components/Image";
 import classNames from "classnames";
 import copyToClipboard from "@/utils/copyToClipboard";
+import { ChatData } from "@/store/Chat";
+import { ItemType } from "antd/es/menu/hooks/useItems";
 
-interface Props {
-    dateTime?: string;
-    text?: string;
-    inversion?: boolean;
-    error?: boolean;
-    loading?: boolean;
-    isImage?: boolean;
-    images?: string[];
+interface Props extends Omit<ChatData, "requestOptions"> {
     onRegenerate?: () => void;
     onDelete?: () => void;
+    onOperate?: (type: string, index: number) => void;
 }
 
 const Message: React.FC<Props> = ({
@@ -33,9 +31,55 @@ const Message: React.FC<Props> = ({
     loading,
     isImage,
     images,
+    model,
     onRegenerate,
     onDelete,
+    onOperate,
 }) => {
+    const moreItems: ItemType[] = [
+        {
+            label: "复制",
+            key: "copy",
+            icon: <CopyOutlined />,
+            onClick: async () => {
+                await copyToClipboard(text || "");
+                message.success(isImage ? "图片链接已复制到剪切板" : "复制成功");
+            },
+        },
+        {
+            label: "删除",
+            key: "delete",
+            icon: <DeleteOutlined />,
+            onClick: onDelete,
+        },
+    ];
+    const isMidjourney = model === "image$midjourney";
+
+    if (isMidjourney && images?.length) {
+        moreItems.unshift(
+            {
+                label: "放大",
+                key: "upscale",
+                icon: <FullscreenOutlined />,
+                children: [1, 2, 3, 4].map((i) => ({
+                    label: `图${i}`,
+                    key: `upscale-${i}`,
+                    onClick: () => onOperate?.("upscale", i),
+                })),
+            },
+            {
+                label: "变换",
+                key: "variation",
+                icon: <BlockOutlined />,
+                children: [1, 2, 3, 4].map((i) => ({
+                    label: `图${i}`,
+                    key: `variation-${i}`,
+                    onClick: () => onOperate?.("variation", i),
+                })),
+            }
+        );
+    }
+
     return (
         <div
             className={classNames(
@@ -96,25 +140,7 @@ const Message: React.FC<Props> = ({
                         )}
                         <Dropdown
                             menu={{
-                                items: [
-                                    {
-                                        label: "复制",
-                                        key: "copy",
-                                        icon: <CopyOutlined />,
-                                        onClick: async () => {
-                                            await copyToClipboard(text || "");
-                                            message.success(
-                                                isImage ? "图片链接已复制到剪切板" : "复制成功"
-                                            );
-                                        },
-                                    },
-                                    {
-                                        label: "删除",
-                                        key: "delete",
-                                        icon: <DeleteOutlined />,
-                                        onClick: onDelete,
-                                    },
-                                ],
+                                items: moreItems,
                             }}
                         >
                             <Button
