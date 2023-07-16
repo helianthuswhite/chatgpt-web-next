@@ -24,14 +24,15 @@ const Setting: React.FC<Props> = ({ open, notice, onCancel }) => {
             width={800}
             bodyStyle={isMobile ? {} : { padding: "10px 20px 0 0" }}
         >
-            <Tabs destroyInactiveTabPane tabPosition={isMobile ? "top" : "left"}>
+            {/* <Tabs destroyInactiveTabPane tabPosition={isMobile ? "top" : "left"}>
                 <Tabs.TabPane tab="基本信息" key="1">
                     <BasicInfo notice={notice} />
                 </Tabs.TabPane>
                 <Tabs.TabPane tab="购买套餐" key="2">
                     <Billing />
                 </Tabs.TabPane>
-            </Tabs>
+            </Tabs> */}
+            <BasicInfo notice={notice} />
         </Modal>
     );
 };
